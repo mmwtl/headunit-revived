@@ -73,6 +73,7 @@ class AapTransport(
     private var aapRead: AapRead? = null
     var isQuittingAllowed: Boolean = false
     var ignoreNextStopRequest: Boolean = false
+    var onAudioFocusStateChanged: ((Boolean) -> Unit)? = null
     private var pollHandler: Handler? = null
     private val pollHandlerCallback = Handler.Callback {
         val ret = aapRead?.read() ?: -1

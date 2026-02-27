@@ -54,6 +54,24 @@ class AapService : Service(), UsbReceiver.Listener {
     private var wirelessServer: WirelessServer? = null
     private var mediaSession: MediaSessionCompat? = null
 
+    fun updateMediaSessionState(isPlaying: Boolean) {
+        val state = if (isPlaying) {
+            android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
+        } else {
+            android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
+        }
+        
+        mediaSession?.setPlaybackState(
+            android.support.v4.media.session.PlaybackStateCompat.Builder()
+                .setState(state, 0, 1.0f)
+                .setActions(android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY or 
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE or 
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP)
+                .build()
+        )
+        AppLog.d("MediaSession: State updated to ${if (isPlaying) "PLAYING" else "STOPPED"}")
+    }
+
     private var pendingConnectionType: String = ""
     private var pendingConnectionIp: String = ""
     private var pendingConnectionUsbDevice: String = ""
@@ -553,6 +571,10 @@ class AapService : Service(), UsbReceiver.Listener {
                     // Create MediaSession to get higher audio priority
                     mediaSession = MediaSessionCompat(this@AapService, "HeadunitRevived").apply {
                         isActive = true
+                    }
+
+                    transport.onAudioFocusStateChanged = { isPlaying ->
+                        updateMediaSessionState(isPlaying)
                     }
 
                     // Sync current night mode state immediately after connection

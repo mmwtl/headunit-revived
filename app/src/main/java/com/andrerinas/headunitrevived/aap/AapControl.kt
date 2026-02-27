@@ -293,6 +293,9 @@ internal class AapControlService(
                 val msg = AapMessage(channel, Control.ControlMsgType.MESSAGE_AUDIO_FOCUS_NOTIFICATION_VALUE, response.build())
                 AppLog.i(msg.toString())
                 aapTransport.send(msg)
+
+                // Sync MediaSession
+                aapTransport.onAudioFocusStateChanged?.invoke(newSate == Control.AudioFocusNotification.AudioFocusStateType.STATE_GAIN)
             }
         })
 
@@ -304,12 +307,18 @@ internal class AapControlService(
                 AppLog.i("Sending immediate AudioFocusNotification: $state")
                 val msg = AapMessage(channel, Control.ControlMsgType.MESSAGE_AUDIO_FOCUS_NOTIFICATION_VALUE, response.build())
                 aapTransport.send(msg)
+
+                // Notify transport about focus gain to sync MediaSession
+                if (state == Control.AudioFocusNotification.AudioFocusStateType.STATE_GAIN) {
+                    aapTransport.onAudioFocusStateChanged?.invoke(true)
+                }
             }
         } else {
             AppLog.w("Audio focus request NOT granted immediately ($result). Sending LOSS.")
-            val msg = AapMessage(channel, Control.ControlMsgType.MESSAGE_AUDIO_FOCUS_NOTIFICATION_VALUE, 
+            val msg = AapMessage(channel, Control.ControlMsgType.MESSAGE_AUDIO_FOCUS_NOTIFICATION_VALUE,
                 Control.AudioFocusNotification.newBuilder().setFocusState(Control.AudioFocusNotification.AudioFocusStateType.STATE_LOSS).build())
             aapTransport.send(msg)
+            aapTransport.onAudioFocusStateChanged?.invoke(false)
         }
 
         return 0
