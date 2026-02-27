@@ -354,6 +354,14 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         return true
     }
 
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        // On older devices (API < 19), the system often consumes the first touch 
+        // to show system bars. By handling it here, we ensure it's sent to AA.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            sendTouchEvent(event)
+        }
+        return super.dispatchTouchEvent(event)
+    }
 
     private fun onKeyEvent(keyCode: Int, isPress: Boolean) {
         transport.send(keyCode, isPress)
