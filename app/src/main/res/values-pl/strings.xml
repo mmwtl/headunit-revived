@@ -157,6 +157,11 @@
     <string name="move_up">Przesuń w górę</string>
     <string name="move_down">Przesuń w dół</string>
     <string name="auto_connecting_single_usb">Automatyczne łączenie z urządzeniem USB…</string>
+    <string name="usb_stability_check">Sprawdzanie stabilności USB</string>
+    <string name="usb_stability_check_description">Włącz, jeśli bezprzewodowy adapter Android Auto wielokrotnie się rozłącza i ponownie łączy, zanim zacznie działać poprawnie</string>
+    <string name="usb_stability_timeout">Limit czasu stabilności</string>
+    <string name="usb_stability_timeout_description">Sekundy, przez które urządzenie musi pozostać podłączone przed automatycznym połączeniem (%d s)</string>
+    <string name="usb_device_settling">Oczekiwanie na stabilizację urządzenia USB…</string>
     <string name="video_codec">Kodek wideo</string>
     <string name="fps_limit">Limit FPS</string>
     <string name="save">Zapisz</string>

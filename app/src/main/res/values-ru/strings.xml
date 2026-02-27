@@ -157,6 +157,11 @@
     <string name="move_up">Вверх</string>
     <string name="move_down">Вниз</string>
     <string name="auto_connecting_single_usb">Автоподключение к USB-устройству…</string>
+    <string name="usb_stability_check">Проверка стабильности USB</string>
+    <string name="usb_stability_check_description">Включите, если ваш беспроводной адаптер Android Auto отключается и подключается несколько раз, прежде чем начать работать правильно</string>
+    <string name="usb_stability_timeout">Таймаут стабильности</string>
+    <string name="usb_stability_timeout_description">Секунды, в течение которых устройство должно оставаться подключённым перед автоподключением (%d с)</string>
+    <string name="usb_device_settling">Ожидание стабилизации USB-устройства…</string>
     <string name="video_codec">Видеокодек</string>
     <string name="fps_limit">Ограничение FPS</string>
     <string name="save">Сохранить</string>

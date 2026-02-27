@@ -159,6 +159,11 @@
     <string name="move_up">Nach oben</string>
     <string name="move_down">Nach unten</string>
     <string name="auto_connecting_single_usb">Automatische Verbindung zum USB-Gerät…</string>
+    <string name="usb_stability_check">USB-Stabilitätsprüfung</string>
+    <string name="usb_stability_check_description">Aktivieren, wenn Ihr kabelloser Android Auto-Adapter sich mehrmals trennt und wieder verbindet, bevor er korrekt funktioniert</string>
+    <string name="usb_stability_timeout">Stabilitäts-Zeitlimit</string>
+    <string name="usb_stability_timeout_description">Sekunden, die das Gerät verbunden bleiben muss, bevor es automatisch verbunden wird (%d s)</string>
+    <string name="usb_device_settling">Warten auf Stabilisierung des USB-Geräts…</string>
     <string name="video_codec">Video Codec</string>
     <string name="fps_limit">FPS Limit</string>
     <string name="save">Speichern</string>

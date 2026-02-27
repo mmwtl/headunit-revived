@@ -61,6 +61,9 @@ class AapService : Service(), UsbReceiver.Listener {
     private val isConnecting = AtomicBoolean(false)
     private var isDestroying = false
 
+    private var usbStabilityJob: Job? = null
+    private var stableDeviceName: String? = null
+
     private val transport: AapTransport
         get() = App.provide(this).transport
 
@@ -163,19 +166,69 @@ class AapService : Service(), UsbReceiver.Listener {
         if (singleUsb) {
             val nonAccessoryDevices = deviceList.values.filter { !UsbDeviceCompat.isInAccessoryMode(it) }
             if (nonAccessoryDevices.size == 1) {
-                val device = nonAccessoryDevices[0]
-                if (usbManager.hasPermission(device)) {
-                    AppLog.i("Single USB auto-connect: connecting to ${UsbDeviceCompat(device).uniqueName}")
-                    val usbMode = UsbAccessoryMode(usbManager)
-                    if (usbMode.connectAndSwitch(device)) {
-                        AppLog.i("Successfully requested switch to accessory mode for single USB device")
-                        return
-                    }
-                } else {
-                    AppLog.i("Single USB auto-connect: device found but no permission")
-                }
+                startSingleUsbStabilityCheck(nonAccessoryDevices[0])
+                return
+            } else if (usbStabilityJob != null) {
+                cancelUsbStabilityCheck()
             }
         }
+    }
+
+    private fun startSingleUsbStabilityCheck(device: UsbDevice) {
+        val settings = App.provide(this).settings
+        if (!settings.usbStabilityCheck) {
+            performSingleUsbConnect(device)
+            return
+        }
+
+        val deviceName = UsbDeviceCompat(device).uniqueName
+        val timeoutMs = settings.usbStabilityTimeout * 1000L
+
+        stableDeviceName = deviceName
+        usbStabilityJob?.cancel()
+
+        AppLog.i("USB stability: Starting ${settings.usbStabilityTimeout}s timer for $deviceName")
+        Toast.makeText(this, getString(R.string.usb_device_settling), Toast.LENGTH_SHORT).show()
+
+        usbStabilityJob = serviceScope.launch {
+            delay(timeoutMs)
+
+            val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+            val stillPresent = usbManager.deviceList.values.any {
+                UsbDeviceCompat(it).uniqueName == deviceName
+            }
+
+            if (stillPresent) {
+                val dev = usbManager.deviceList.values.first {
+                    UsbDeviceCompat(it).uniqueName == deviceName
+                }
+                AppLog.i("USB stability: Device $deviceName stable after ${settings.usbStabilityTimeout}s, connecting")
+                performSingleUsbConnect(dev)
+            } else {
+                AppLog.i("USB stability: Device $deviceName disappeared during wait")
+                cancelUsbStabilityCheck()
+            }
+        }
+    }
+
+    private fun performSingleUsbConnect(device: UsbDevice) {
+        val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+        if (usbManager.hasPermission(device)) {
+            AppLog.i("Single USB auto-connect: connecting to ${UsbDeviceCompat(device).uniqueName}")
+            val usbMode = UsbAccessoryMode(usbManager)
+            if (usbMode.connectAndSwitch(device)) {
+                AppLog.i("Successfully requested switch to accessory mode for single USB device")
+            }
+        } else {
+            AppLog.i("Single USB auto-connect: device found but no permission")
+        }
+        cancelUsbStabilityCheck()
+    }
+
+    private fun cancelUsbStabilityCheck() {
+        usbStabilityJob?.cancel()
+        usbStabilityJob = null
+        stableDeviceName = null
     }
 
     private fun createNotification(): Notification {
@@ -228,6 +281,7 @@ class AapService : Service(), UsbReceiver.Listener {
         isDestroying = true
         stopForeground(true)
         stopWirelessServer();
+        cancelUsbStabilityCheck()
         serviceJob.cancel();
         onDisconnect();
         nightModeManager?.stop()
@@ -609,6 +663,7 @@ class AapService : Service(), UsbReceiver.Listener {
 
     private fun onDisconnect(isClean: Boolean = false) {
         isConnected = false;
+        cancelUsbStabilityCheck()
         if (!isDestroying) {
             updateNotification();
         }
@@ -649,6 +704,12 @@ class AapService : Service(), UsbReceiver.Listener {
     }
 
     override fun onUsbDetach(device: UsbDevice) {
+        val detachedName = UsbDeviceCompat(device).uniqueName
+        if (stableDeviceName == detachedName) {
+            AppLog.i("USB stability: Tracked device $detachedName detached, resetting timer")
+            cancelUsbStabilityCheck()
+        }
+
         if (accessoryConnection is UsbAccessoryConnection) {
             if ((accessoryConnection as UsbAccessoryConnection).isDeviceRunning(device)) {
                 onDisconnect();

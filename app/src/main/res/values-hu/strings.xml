@@ -150,6 +150,11 @@
     <string name="auto_connect_single_usb">USB-eszköz automatikus csatlakoztatása</string>
     <string name="auto_connect_single_usb_description">Automatikus csatlakozás, ha csak egy kompatibilis eszköz érhető el</string>
     <string name="auto_connecting_single_usb">Automatikus csatlakozás USB-eszközhöz…</string>
+    <string name="usb_stability_check">USB stabilitás ellenőrzés</string>
+    <string name="usb_stability_check_description">Engedélyezze, ha a vezeték nélküli Android Auto adapter többször lecsatlakozik és újracsatlakozik, mielőtt megfelelően működne</string>
+    <string name="usb_stability_timeout">Stabilitási időkorlát</string>
+    <string name="usb_stability_timeout_description">Másodpercek, ameddig az eszköznek csatlakozva kell maradnia az automatikus csatlakozás előtt (%d mp)</string>
+    <string name="usb_device_settling">Várakozás az USB-eszköz stabilizálódására…</string>
     <string name="auto_connect_settings">Automatikus csatlakozás beállítások</string>
     <string name="auto_connect_settings_description">Az automatikus csatlakozási módok és prioritásuk konfigurálása</string>
     <string name="auto_connect_help">Ezek a módszerek automatikusan futnak az alkalmazás megnyitásakor. Engedélyezze a kívántakat, majd húzza őket a sorrend beállításához. Az első sikeres engedélyezett módszer kerül felhasználásra.</string>

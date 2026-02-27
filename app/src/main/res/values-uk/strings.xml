@@ -157,6 +157,11 @@
     <string name="move_up">Вгору</string>
     <string name="move_down">Вниз</string>
     <string name="auto_connecting_single_usb">Автопідключення до USB-пристрою…</string>
+    <string name="usb_stability_check">Перевірка стабільності USB</string>
+    <string name="usb_stability_check_description">Увімкніть, якщо ваш бездротовий адаптер Android Auto відключається та підключається кілька разів, перш ніж почати працювати правильно</string>
+    <string name="usb_stability_timeout">Таймаут стабільності</string>
+    <string name="usb_stability_timeout_description">Секунди, протягом яких пристрій має залишатися підключеним перед автопідключенням (%d с)</string>
+    <string name="usb_device_settling">Очікування стабілізації USB-пристрою…</string>
     <string name="video_codec">Відеокодек</string>
     <string name="fps_limit">Обмеження FPS</string>
     <string name="save">Зберегти</string>

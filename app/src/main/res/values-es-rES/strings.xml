@@ -157,6 +157,11 @@
     <string name="move_up">Subir</string>
     <string name="move_down">Bajar</string>
     <string name="auto_connecting_single_usb">Conectando automáticamente al dispositivo USB…</string>
+    <string name="usb_stability_check">Verificación de estabilidad USB</string>
+    <string name="usb_stability_check_description">Activa si tu adaptador inalámbrico de Android Auto se desconecta y reconecta varias veces antes de funcionar correctamente</string>
+    <string name="usb_stability_timeout">Tiempo de espera de estabilidad</string>
+    <string name="usb_stability_timeout_description">Segundos que el dispositivo debe permanecer conectado antes de conectar automáticamente (%d s)</string>
+    <string name="usb_device_settling">Esperando a que el dispositivo USB se estabilice…</string>
     <string name="video_codec">Códec de vídeo</string>
     <string name="fps_limit">Límite FPS</string>
     <string name="save">Guardar</string>

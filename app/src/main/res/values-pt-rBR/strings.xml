@@ -157,6 +157,11 @@
     <string name="move_up">Mover para cima</string>
     <string name="move_down">Mover para baixo</string>
     <string name="auto_connecting_single_usb">Conectando automaticamente ao dispositivo USB…</string>
+    <string name="usb_stability_check">Verificação de estabilidade USB</string>
+    <string name="usb_stability_check_description">Ative se o seu adaptador sem fio do Android Auto desconecta e reconecta várias vezes antes de funcionar corretamente</string>
+    <string name="usb_stability_timeout">Tempo limite de estabilidade</string>
+    <string name="usb_stability_timeout_description">Segundos que o dispositivo deve permanecer conectado antes de conectar automaticamente (%d s)</string>
+    <string name="usb_device_settling">Aguardando estabilização do dispositivo USB…</string>
     <string name="video_codec">Codec de vídeo</string>
     <string name="fps_limit">Limite de FPS</string>
     <string name="save">Salvar</string>

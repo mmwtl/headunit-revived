@@ -156,6 +156,11 @@
     <string name="move_up">Omhoog</string>
     <string name="move_down">Omlaag</string>
     <string name="auto_connecting_single_usb">Automatisch verbinden met USB-apparaat…</string>
+    <string name="usb_stability_check">USB-stabiliteitscontrole</string>
+    <string name="usb_stability_check_description">Schakel in als uw draadloze Android Auto-adapter meerdere keren loskoppelt en opnieuw verbindt voordat deze correct werkt</string>
+    <string name="usb_stability_timeout">Stabiliteits-timeout</string>
+    <string name="usb_stability_timeout_description">Seconden dat het apparaat verbonden moet blijven voordat automatisch wordt verbonden (%d s)</string>
+    <string name="usb_device_settling">Wachten tot USB-apparaat stabiel is…</string>
     <string name="video_codec">Video Codec</string>
     <string name="fps_limit">FPS Limiet</string>
     <string name="save">Opslaan</string>

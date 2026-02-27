@@ -159,6 +159,11 @@
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
     <string name="auto_connecting_single_usb">Auto-connecting to USB device…</string>
+    <string name="usb_stability_check">USB stability check</string>
+    <string name="usb_stability_check_description">Enable if your wireless Android Auto adapter disconnects and reconnects several times before working correctly</string>
+    <string name="usb_stability_timeout">Stability timeout</string>
+    <string name="usb_stability_timeout_description">Seconds the device must stay connected before auto-connecting (%d s)</string>
+    <string name="usb_device_settling">Waiting for USB device to stabilize…</string>
     <string name="video_codec">Video Codec</string>
     <string name="fps_limit">FPS Limit</string>
     <string name="save">Save</string>
