@@ -107,7 +107,9 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            enableEdgeToEdge()
+        }
         super.onCreate(savedInstanceState)
 
         val screenOrientation = settings.screenOrientation
@@ -322,6 +324,11 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
 
         val horizontalCorrection = HeadUnitScreenConfig.getHorizontalCorrection()
         val verticalCorrection = HeadUnitScreenConfig.getVerticalCorrection()
+
+        if (horizontalCorrection <= 0 || verticalCorrection <= 0) {
+            AppLog.w("sendTouchEvent: Ignoring touch, screen config not ready yet.")
+            return
+        }
 
         val pointerData = mutableListOf<Triple<Int, Int, Int>>()
         repeat(event.pointerCount) { pointerIndex ->

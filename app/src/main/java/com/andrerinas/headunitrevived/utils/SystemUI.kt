@@ -43,6 +43,13 @@ object SystemUI {
                 // For devices below KitKat (API 19), we also set the window flag for better reliability
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    
+                    // On API < 19, simpler is better. Using too many LAYOUT flags 
+                    // often causes the first touch to be consumed by the system.
+                    window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_LOW_PROFILE)
+                    return
                 }
 
                 var flags = (View.SYSTEM_UI_FLAG_FULLSCREEN
