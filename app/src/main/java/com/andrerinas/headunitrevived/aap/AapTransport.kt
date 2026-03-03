@@ -279,18 +279,35 @@ class AapTransport(
                 }
 
                 AppLog.d("Handshake: Waiting for version response. TS: ${SystemClock.elapsedRealtime()}")
-                ret = connection.recvBlocking(buffer, buffer.size, 2000, false)
-
-                if (ret > 0) {
-                    val hexResponse = StringBuilder()
-                    for (i in 0 until minOf(ret, 16)) {
-                        hexResponse.append(String.format("%02X ", buffer[i]))
+                // Inner loop: drain messages until we see channel=0 type=2 (VERSION_RESPONSE).
+                // On first connection the phone may send a proactive message (e.g. a ping or a
+                // status) before the version response arrives. Accepting any non-empty read as
+                // "version response received" would hand a random payload to the SSL layer and
+                // cause a 15 s timeout. Instead, discard unexpected messages and keep reading
+                // until the deadline expires.
+                val recvDeadline = SystemClock.elapsedRealtime() + 2000
+                while (SystemClock.elapsedRealtime() < recvDeadline) {
+                    val remaining = (recvDeadline - SystemClock.elapsedRealtime())
+                        .toInt().coerceAtLeast(100)
+                    ret = connection.recvBlocking(buffer, buffer.size, remaining, false)
+                    if (ret <= 0) break  // timeout or error — fall through to outer retry
+                    if (ret >= 6
+                        && buffer[0] == 0.toByte()
+                        && buffer[4] == 0.toByte()
+                        && buffer[5] == 2.toByte()) {
+                        AppLog.i("Handshake: Version response received (ret=$ret, attempt=$attempt).")
+                        received = true
+                        break
                     }
-                    AppLog.i("Handshake: Version response received (ret=$ret). Bytes: $hexResponse")
-                    received = true
-                    break
+                    // Wrong message — log and keep draining.
+                    val ch   = buffer[0].toInt() and 0xFF
+                    val type = ((buffer[4].toInt() and 0xFF) shl 8) or (buffer[5].toInt() and 0xFF)
+                    AppLog.w("Handshake: Ignoring unexpected message " +
+                             "(ch=$ch, type=0x${type.toString(16)}, len=$ret). " +
+                             "Waiting for VERSION_RESPONSE.")
                 }
-                AppLog.w("Handshake: Version response recv failed (ret=$ret), attempt $attempt")
+                if (received) break
+                AppLog.w("Handshake: No VERSION_RESPONSE within 2s (attempt $attempt), ret=$ret")
                 SystemClock.sleep(200)
             }
 

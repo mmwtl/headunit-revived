@@ -140,6 +140,8 @@ class UsbAccessoryConnection(private val usbMgr: UsbManager, private val device:
                 Thread.sleep(100)
                 if (connection.claimInterface(iface, true)) {
                     AppLog.i("USB interface re-claimed successfully")
+                    internalBufferPos = 0
+                    internalBufferAvailable = 0
                     initEndpoint()
                 } else {
                     AppLog.e("Failed to re-claim USB interface")
