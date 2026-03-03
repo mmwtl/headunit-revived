@@ -52,7 +52,6 @@ class SettingsFragment : Fragment() {
     private var pendingAutoConnectLastSession: Boolean? = null
     private var pendingVideoCodec: String? = null
     private var pendingFpsLimit: Int? = null
-    private var pendingDebugMode: Boolean? = null
     private var pendingBluetoothAddress: String? = null
     private var pendingEnableAudioSink: Boolean? = null
     private var pendingUseAacAudio: Boolean? = null
@@ -108,7 +107,6 @@ class SettingsFragment : Fragment() {
         pendingAutoConnectLastSession = settings.autoConnectLastSession
         pendingVideoCodec = settings.videoCodec
         pendingFpsLimit = settings.fpsLimit
-        pendingDebugMode = settings.debugMode
         pendingBluetoothAddress = settings.bluetoothAddress
         pendingEnableAudioSink = settings.enableAudioSink
         pendingUseAacAudio = settings.useAacAudio
@@ -212,7 +210,6 @@ class SettingsFragment : Fragment() {
         pendingRightHandDrive?.let { settings.rightHandDrive = it }
         pendingVideoCodec?.let { settings.videoCodec = it }
         pendingFpsLimit?.let { settings.fpsLimit = it }
-        pendingDebugMode?.let { settings.debugMode = it }
         pendingBluetoothAddress?.let { settings.bluetoothAddress = it }
         pendingEnableAudioSink?.let { settings.enableAudioSink = it }
         pendingUseAacAudio?.let { settings.useAacAudio = it }
@@ -317,7 +314,6 @@ class SettingsFragment : Fragment() {
                         pendingAutoConnectLastSession != settings.autoConnectLastSession ||
                         pendingVideoCodec != settings.videoCodec ||
                         pendingFpsLimit != settings.fpsLimit ||
-                        pendingDebugMode != settings.debugMode ||
                         pendingBluetoothAddress != settings.bluetoothAddress ||
                         pendingEnableAudioSink != settings.enableAudioSink ||
                         pendingUseAacAudio != settings.useAacAudio ||
@@ -830,15 +826,37 @@ class SettingsFragment : Fragment() {
         // --- Debug Settings ---
         items.add(SettingItem.CategoryHeader("debug", R.string.category_debug))
 
-        items.add(SettingItem.ToggleSettingEntry(
-            stableId = "debugMode",
-            nameResId = R.string.debug_mode,
-            descriptionResId = R.string.debug_mode_description,
-            isChecked = pendingDebugMode!!,
-            onCheckedChanged = { isChecked ->
-                pendingDebugMode = isChecked
-                checkChanges()
+        items.add(SettingItem.SettingEntry(
+            stableId = "captureLog",
+            nameResId = if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) R.string.stop_log_capture else R.string.start_log_capture,
+            value = getString(if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) R.string.stop_log_capture_description else R.string.start_log_capture_description),
+            onClick = {
+                val context = requireContext()
+                if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) {
+                    com.andrerinas.headunitrevived.utils.LogExporter.stopCapture()
+                } else {
+                    com.andrerinas.headunitrevived.utils.LogExporter.startCapture(context, settings.logVerbosity)
+                }
                 updateSettingsList()
+            }
+        ))
+
+        val verbosityLevels = com.andrerinas.headunitrevived.utils.LogExporter.Verbosity.entries
+        val verbosityNames = verbosityLevels.map { it.name.lowercase().replaceFirstChar { c -> c.uppercase() } }.toTypedArray()
+        items.add(SettingItem.SettingEntry(
+            stableId = "logVerbosity",
+            nameResId = R.string.log_verbosity,
+            value = settings.logVerbosity.name.lowercase().replaceFirstChar { it.uppercase() },
+            onClick = {
+                val currentIndex = verbosityLevels.indexOf(settings.logVerbosity)
+                MaterialAlertDialogBuilder(requireContext(), R.style.DarkAlertDialog)
+                    .setTitle(R.string.log_verbosity)
+                    .setSingleChoiceItems(verbosityNames, currentIndex) { dialog, which ->
+                        settings.logVerbosity = verbosityLevels[which]
+                        dialog.dismiss()
+                        updateSettingsList()
+                    }
+                    .show()
             }
         ))
 
@@ -848,7 +866,11 @@ class SettingsFragment : Fragment() {
             value = getString(R.string.export_logs_description),
             onClick = {
                 val context = requireContext()
-                val logFile = com.andrerinas.headunitrevived.utils.LogExporter.saveLogToPublicFile(context)
+                if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) {
+                    com.andrerinas.headunitrevived.utils.LogExporter.stopCapture()
+                }
+                val logFile = com.andrerinas.headunitrevived.utils.LogExporter.saveLogToPublicFile(context, settings.logVerbosity)
+                updateSettingsList()
 
                 if (logFile != null) {
                     MaterialAlertDialogBuilder(context, R.style.DarkAlertDialog)
