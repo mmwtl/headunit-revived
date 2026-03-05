@@ -23,7 +23,6 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.andrerinas.headunitrevived.App
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.andrerinas.headunitrevived.R
@@ -320,7 +319,7 @@ class NetworkListFragment : Fragment(), NetworkDiscovery.Listener {
                 ContextCompat.startForegroundService(context, Intent(context, AapService::class.java).apply {
                     action = AapService.ACTION_CONNECT_SOCKET
                 })
-                CoroutineScope(Dispatchers.Main).launch { App.provide(context).commManager.connect(ip, 5277) }
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { App.provide(context).commManager.connect(ip, 5277) }
             } else {
                 this.removeAddress(v.getTag(R.integer.key_data) as String)
             }
