@@ -296,16 +296,12 @@ class AapService : Service(), UsbReceiver.Listener {
         mediaSession?.isActive = false
         mediaSession?.release()
         mediaSession = null
-        commManager.disconnect()
-        serviceScope.launch(Dispatchers.IO) {
-            App.provide(this@AapService).audioDecoder.stop()
-            App.provide(this@AapService).videoDecoder.stop("AapService::onDestroy")
-        }
+        commManager.destroy()
         nightModeManager?.stop()
         unregisterReceiver(nightModeUpdateReceiver)
         unregisterReceiver(usbReceiver)
         uiModeManager.disableCarMode(0)
-        serviceScope.cancel() // cancel last so the IO decoder-stop launch above can complete
+        serviceScope.cancel()
         super.onDestroy()
     }
 

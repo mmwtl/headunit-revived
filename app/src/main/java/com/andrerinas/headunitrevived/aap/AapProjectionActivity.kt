@@ -24,7 +24,6 @@ import com.andrerinas.headunitrevived.aap.protocol.messages.VideoFocusEvent
 import com.andrerinas.headunitrevived.app.SurfaceActivity
 import com.andrerinas.headunitrevived.connection.CommManager
 import com.andrerinas.headunitrevived.contract.KeyIntent
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import com.andrerinas.headunitrevived.decoder.VideoDecoder
 import com.andrerinas.headunitrevived.decoder.VideoDimensionsListener
@@ -138,25 +137,21 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                commManager.connectionState
-                    .filterIsInstance<CommManager.ConnectionState.Disconnected>()
-                    .collect { finish() }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                commManager.connectionState
-                    .filterIsInstance<CommManager.ConnectionState.HandshakeComplete>()
-                    .collect {
-                        // Handshake done. If the surface is already ready (e.g. reconnect
-                        // while the activity is in the foreground), start reading immediately.
-                        // If not, onSurfaceChanged() will call startReading() when the surface
-                        // becomes available.
-                        if (isSurfaceSet) {
-                            commManager.startReading()
+                commManager.connectionState.collect { state ->
+                    when (state) {
+                        is CommManager.ConnectionState.Disconnected -> finish()
+                        is CommManager.ConnectionState.HandshakeComplete -> {
+                            // Handshake done. If the surface is already ready (e.g. reconnect
+                            // while the activity is in the foreground), start reading immediately.
+                            // If not, onSurfaceChanged() will call startReading() when the surface
+                            // becomes available.
+                            if (isSurfaceSet) {
+                                commManager.startReading()
+                            }
                         }
+                        else -> {}
                     }
+                }
             }
         }
 
