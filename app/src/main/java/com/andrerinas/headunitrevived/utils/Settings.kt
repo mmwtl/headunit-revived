@@ -102,11 +102,11 @@ class Settings(context: Context) {
             prefs.edit().putStringSet("key-codes", list.toSet()).apply()
         }
 
-    var debugMode: Boolean
-        get() = prefs.getBoolean("debug-mode", false)
-        set(value) {
-            prefs.edit().putBoolean("debug-mode", value).apply()
-        }
+    var exporterLogLevel: LogExporter.LogLevel
+        get() = LogExporter.LogLevel.entries.getOrElse(prefs.getInt("log-level", LogExporter.LogLevel.INFO.ordinal)) { LogExporter.LogLevel.INFO }
+        set(value) { prefs.edit().putInt("log-level", value.ordinal).apply() }
+
+    val logLevel: Int get() = exporterLogLevel.logLevel
 
     var viewMode: ViewMode
         get() {

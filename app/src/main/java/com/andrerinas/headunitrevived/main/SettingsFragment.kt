@@ -70,7 +70,6 @@ class SettingsFragment : Fragment() {
     private var pendingWifiConnectionMode: Int? = null
     private var pendingVideoCodec: String? = null
     private var pendingFpsLimit: Int? = null
-    private var pendingDebugMode: Boolean? = null
     private var pendingBluetoothAddress: String? = null
     private var pendingEnableAudioSink: Boolean? = null
     private var pendingUseAacAudio: Boolean? = null
@@ -93,7 +92,6 @@ class SettingsFragment : Fragment() {
     private var pendingAutoStartOnUsb: Boolean? = null
     private var pendingUsbStabilityCheck: Boolean? = null
     private var pendingUsbStabilityTimeout: Int? = null
-    private var pendingMaxAutoRetryAttempts: Int? = null
 
     private var pendingMediaVolumeOffset: Int? = null
     private var pendingAssistantVolumeOffset: Int? = null
@@ -129,7 +127,6 @@ class SettingsFragment : Fragment() {
         pendingWifiConnectionMode = settings.wifiConnectionMode
         pendingVideoCodec = settings.videoCodec
         pendingFpsLimit = settings.fpsLimit
-        pendingDebugMode = settings.debugMode
         pendingBluetoothAddress = settings.bluetoothAddress
         pendingEnableAudioSink = settings.enableAudioSink
         pendingUseAacAudio = settings.useAacAudio
@@ -140,7 +137,6 @@ class SettingsFragment : Fragment() {
         pendingAutoStartOnUsb = settings.autoStartOnUsb
         pendingUsbStabilityCheck = settings.usbStabilityCheck
         pendingUsbStabilityTimeout = settings.usbStabilityTimeout
-        pendingMaxAutoRetryAttempts = settings.maxAutoRetryAttempts
         pendingScreenOrientation = settings.screenOrientation
         pendingAppLanguage = settings.appLanguage
         
@@ -236,7 +232,6 @@ class SettingsFragment : Fragment() {
         pendingRightHandDrive?.let { settings.rightHandDrive = it }
         pendingVideoCodec?.let { settings.videoCodec = it }
         pendingFpsLimit?.let { settings.fpsLimit = it }
-        pendingDebugMode?.let { settings.debugMode = it }
         pendingBluetoothAddress?.let { settings.bluetoothAddress = it }
         pendingEnableAudioSink?.let { settings.enableAudioSink = it }
         pendingUseAacAudio?.let { settings.useAacAudio = it }
@@ -247,7 +242,6 @@ class SettingsFragment : Fragment() {
         pendingAutoStartOnUsb?.let { settings.autoStartOnUsb = it }
         pendingUsbStabilityCheck?.let { settings.usbStabilityCheck = it }
         pendingUsbStabilityTimeout?.let { settings.usbStabilityTimeout = it }
-        pendingMaxAutoRetryAttempts?.let { settings.maxAutoRetryAttempts = it }
         pendingScreenOrientation?.let { settings.screenOrientation = it }
 
         pendingMediaVolumeOffset?.let { settings.mediaVolumeOffset = it }
@@ -275,7 +269,7 @@ class SettingsFragment : Fragment() {
         requireContext().sendBroadcast(nightModeUpdateIntent)
 
         if (requiresRestart) {
-            if (AapService.isConnected) {
+            if (App.provide(requireContext()).commManager.isConnected) {
                 Toast.makeText(context, getString(R.string.stopping_service), Toast.LENGTH_SHORT).show()
                 val stopServiceIntent = Intent(requireContext(), AapService::class.java).apply {
                     action = AapService.ACTION_STOP_SERVICE
@@ -333,7 +327,6 @@ class SettingsFragment : Fragment() {
                         pendingWifiConnectionMode != settings.wifiConnectionMode ||
                         pendingVideoCodec != settings.videoCodec ||
                         pendingFpsLimit != settings.fpsLimit ||
-                        pendingDebugMode != settings.debugMode ||
                         pendingBluetoothAddress != settings.bluetoothAddress ||
                         pendingEnableAudioSink != settings.enableAudioSink ||
                         pendingUseAacAudio != settings.useAacAudio ||
@@ -343,7 +336,6 @@ class SettingsFragment : Fragment() {
                         pendingAutoStartOnUsb != settings.autoStartOnUsb ||
                         pendingUsbStabilityCheck != settings.usbStabilityCheck ||
                         pendingUsbStabilityTimeout != settings.usbStabilityTimeout ||
-                        pendingMaxAutoRetryAttempts != settings.maxAutoRetryAttempts ||
                         pendingScreenOrientation != settings.screenOrientation ||
                         pendingAppLanguage != settings.appLanguage ||
                         pendingInsetLeft != settings.insetLeft ||
@@ -647,21 +639,6 @@ class SettingsFragment : Fragment() {
             ))
         }
 
-        items.add(SettingItem.SliderSettingEntry(
-            stableId = "maxAutoRetryAttempts",
-            nameResId = R.string.max_auto_retry_attempts,
-            value = getString(R.string.max_auto_retry_attempts_description, pendingMaxAutoRetryAttempts!!),
-            sliderValue = pendingMaxAutoRetryAttempts!!.toFloat(),
-            valueFrom = 1f,
-            valueTo = 10f,
-            stepSize = 1f,
-            onValueChanged = { value ->
-                pendingMaxAutoRetryAttempts = value.toInt()
-                checkChanges()
-                updateSettingsList()
-            }
-        ))
-
         // --- Graphic Settings ---
         items.add(SettingItem.CategoryHeader("graphic", R.string.category_graphic))
         
@@ -898,14 +875,36 @@ class SettingsFragment : Fragment() {
         // --- Debug Settings ---
         items.add(SettingItem.CategoryHeader("debug", R.string.category_debug))
 
-        items.add(SettingItem.ToggleSettingEntry(
-            stableId = "debugMode",
-            nameResId = R.string.debug_mode,
-            descriptionResId = R.string.debug_mode_description,
-            isChecked = pendingDebugMode!!,
-            onCheckedChanged = { isChecked ->
-                pendingDebugMode = isChecked
-                checkChanges()
+        val logLevels = com.andrerinas.headunitrevived.utils.LogExporter.LogLevel.entries
+        val logLevelNames = logLevels.map { it.name.lowercase().replaceFirstChar { c -> c.uppercase() } }.toTypedArray()
+        items.add(SettingItem.SettingEntry(
+            stableId = "logLevel",
+            nameResId = R.string.log_level,
+            value = settings.exporterLogLevel.name.lowercase().replaceFirstChar { it.uppercase() },
+            onClick = {
+                val currentIndex = logLevels.indexOf(settings.exporterLogLevel)
+                MaterialAlertDialogBuilder(requireContext(), R.style.DarkAlertDialog)
+                    .setTitle(R.string.log_level)
+                    .setSingleChoiceItems(logLevelNames, currentIndex) { dialog, which ->
+                        settings.exporterLogLevel = logLevels[which]
+                        dialog.dismiss()
+                        updateSettingsList()
+                    }
+                    .show()
+            }
+        ))
+
+        items.add(SettingItem.SettingEntry(
+            stableId = "captureLog",
+            nameResId = if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) R.string.stop_log_capture else R.string.start_log_capture,
+            value = getString(if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) R.string.stop_log_capture_description else R.string.start_log_capture_description),
+            onClick = {
+                val context = requireContext()
+                if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) {
+                    com.andrerinas.headunitrevived.utils.LogExporter.stopCapture()
+                } else {
+                    com.andrerinas.headunitrevived.utils.LogExporter.startCapture(context, settings.exporterLogLevel)
+                }
                 updateSettingsList()
             }
         ))
@@ -916,7 +915,11 @@ class SettingsFragment : Fragment() {
             value = getString(R.string.export_logs_description),
             onClick = {
                 val context = requireContext()
-                val logFile = com.andrerinas.headunitrevived.utils.LogExporter.saveLogToPublicFile(context)
+                if (com.andrerinas.headunitrevived.utils.LogExporter.isCapturing) {
+                    com.andrerinas.headunitrevived.utils.LogExporter.stopCapture()
+                }
+                val logFile = com.andrerinas.headunitrevived.utils.LogExporter.saveLogToPublicFile(context, settings.exporterLogLevel)
+                updateSettingsList()
 
                 if (logFile != null) {
                     MaterialAlertDialogBuilder(context, R.style.DarkAlertDialog)
