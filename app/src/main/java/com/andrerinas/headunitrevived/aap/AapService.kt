@@ -38,8 +38,6 @@ import com.andrerinas.headunitrevived.utils.LocaleHelper
 import com.andrerinas.headunitrevived.utils.NightModeManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filterIsInstance
 import android.app.NotificationManager
 import java.net.ServerSocket
 
@@ -76,6 +74,8 @@ class AapService : Service(), UsbReceiver.Listener {
      * flow observers that would otherwise update the already-dismissed notification.
      */
     private var isDestroying = false
+    private var hasEverConnected = false
+    private var accessoryHandshakeFailures = 0
 
     private val commManager get() = App.provide(this).commManager
 
@@ -124,9 +124,7 @@ class AapService : Service(), UsbReceiver.Listener {
         startForeground(1, createNotification())
         setupCarMode()
         setupNightMode()
-        observeConnectedState()
-        observeDisconnectedState()
-        observeTransportStartedState()
+        observeConnectionState()
         registerReceivers()
 
         startService(GpsLocationService.intent(this))
@@ -150,42 +148,34 @@ class AapService : Service(), UsbReceiver.Listener {
     }
 
     /**
-     * Observes [CommManager.ConnectionState.Connected] and calls onConnected
+     * Single observer for all [CommManager.ConnectionState] transitions.
+     *
+     * Uses [hasEverConnected] to skip the initial [ConnectionState.Disconnected] emission
+     * from StateFlow replay, avoiding a spurious disconnect on startup.
      */
-    private fun observeConnectedState() {
+    private fun observeConnectionState() {
         serviceScope.launch {
-            commManager.connectionState
-                .filterIsInstance<CommManager.ConnectionState.Connected>()
-                .collect { onConnected() }
-        }
-    }
-
-    /**
-     * Observes [CommManager.ConnectionState.TransportStarted] and syncs night mode.
-     * Night mode must be sent after the transport is ready, not at connection time.
-     */
-    private fun observeTransportStartedState() {
-        serviceScope.launch {
-            commManager.connectionState
-                .filterIsInstance<CommManager.ConnectionState.TransportStarted>()
-                .collect {
-                    sendBroadcast(Intent(ACTION_REQUEST_NIGHT_MODE_UPDATE).apply {
-                        setPackage(packageName)
-                    })
+            commManager.connectionState.collect { state ->
+                when (state) {
+                    is CommManager.ConnectionState.Connected -> onConnected()
+                    is CommManager.ConnectionState.TransportStarted -> {
+                        hasEverConnected = true
+                        accessoryHandshakeFailures = 0
+                        sendBroadcast(Intent(ACTION_REQUEST_NIGHT_MODE_UPDATE).apply {
+                            setPackage(packageName)
+                        })
+                    }
+                    is CommManager.ConnectionState.Error -> {
+                        if (state.message.contains("Handshake failed")) {
+                            onHandshakeFailed()
+                        }
+                    }
+                    is CommManager.ConnectionState.Disconnected -> {
+                        if (hasEverConnected) onDisconnected(state)
+                    }
+                    else -> {}
                 }
-        }
-    }
-
-    /**
-     * Observes [CommManager.ConnectionState.Disconnected] and calls onDisconnect
-     * `drop(1)` skips the initial `Disconnected` value that `StateFlow` replays on subscribe.
-     */
-    private fun observeDisconnectedState() {
-        serviceScope.launch {
-            commManager.connectionState
-                .filterIsInstance<CommManager.ConnectionState.Disconnected>()
-                .drop(1) // skip the StateFlow's initial Disconnected emission on startup
-                .collect { state -> onDisconnected(state) }
+            }
         }
     }
 
@@ -247,10 +237,26 @@ class AapService : Service(), UsbReceiver.Listener {
                 delay(2000)
                 if (!commManager.isConnected) startDiscovery()
             }
-        } else if (!state.isClean) {
-            val mode = App.provide(this).settings.wifiConnectionMode
-            if (mode == 1) {
-                AppLog.i("AapService: Unclean disconnect in Auto Mode. Retrying discovery in 2s...")
+            return
+        }
+
+        val settings = App.provide(this).settings
+        val lastType = settings.lastConnectionType
+
+        // USB auto-reconnect: try again after a delay to give dongles time to re-enumerate
+        if (lastType == com.andrerinas.headunitrevived.utils.Settings.CONNECTION_TYPE_USB &&
+            (settings.autoConnectLastSession || settings.autoConnectSingleUsbDevice)) {
+            AppLog.i("AapService: USB disconnect. Scheduling reconnect check in ${USB_RECONNECT_DELAY_MS}ms...")
+            serviceScope.launch {
+                delay(USB_RECONNECT_DELAY_MS)
+                if (!commManager.isConnected) checkAlreadyConnectedUsb(force = true)
+            }
+        }
+
+        if (!state.isClean) {
+            val mode = settings.wifiConnectionMode
+            if (mode == 1 && lastType != com.andrerinas.headunitrevived.utils.Settings.CONNECTION_TYPE_USB) {
+                AppLog.i("AapService: Unclean WiFi disconnect in Auto Mode. Retrying discovery in 2s...")
                 serviceScope.launch {
                     delay(2000)
                     if (!commManager.isConnected) startDiscovery(oneShot = true)
@@ -329,7 +335,7 @@ class AapService : Service(), UsbReceiver.Listener {
             }
             ACTION_CONNECT_SOCKET        -> {
                 // Caller already invoked commManager.connect(socket); the connectionState
-                // observer in observeConnectedState() handles the rest — nothing to do here.
+                // observer in observeConnectionState() handles the rest — nothing to do here.
             }
             ACTION_CHECK_USB             -> checkAlreadyConnectedUsb(force = true)
             else                         -> {
@@ -365,6 +371,40 @@ class AapService : Service(), UsbReceiver.Listener {
     }
 
     override fun onUsbPermission(granted: Boolean, connect: Boolean, device: UsbDevice) {}
+
+    /**
+     * Called when a handshake fails. If an accessory-mode device is still present,
+     * it's likely a stale wireless AA dongle. Force re-enumeration by sending AOA
+     * descriptors — this resets the dongle's USB state so the next connection
+     * starts with clean buffers.
+     */
+    private fun onHandshakeFailed() {
+        val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+        val accessoryDevice = usbManager.deviceList.values.firstOrNull {
+            UsbDeviceCompat.isInAccessoryMode(it)
+        } ?: return
+
+        accessoryHandshakeFailures++
+        val deviceName = UsbDeviceCompat(accessoryDevice).uniqueName
+        AppLog.w("Handshake failed on accessory device $deviceName (failure #$accessoryHandshakeFailures)")
+
+        if (accessoryHandshakeFailures > MAX_STALE_ACCESSORY_RETRIES) {
+            AppLog.i("Stale accessory detected: forcing re-enumeration via AOA descriptors for $deviceName")
+            accessoryHandshakeFailures = 0
+            val usbMode = UsbAccessoryMode(usbManager)
+            serviceScope.launch(Dispatchers.IO) {
+                try {
+                    if (usbMode.connectAndSwitch(accessoryDevice)) {
+                        AppLog.i("AOA re-enumeration requested for stale device $deviceName")
+                    } else {
+                        AppLog.w("AOA re-enumeration failed for $deviceName")
+                    }
+                } catch (e: Exception) {
+                    AppLog.e("AOA re-enumeration for $deviceName failed with exception", e)
+                }
+            }
+        }
+    }
 
     /**
      * Scans currently connected USB devices and connects to any that are already in
@@ -850,9 +890,15 @@ class AapService : Service(), UsbReceiver.Listener {
         const val ACTION_REQUEST_NIGHT_MODE_UPDATE = "com.andrerinas.headunitrevived.ACTION_REQUEST_NIGHT_MODE_UPDATE"
         /**
          * Sent after the caller has already invoked [CommManager.connect(socket)].
-         * The [observeConnectedState] flow observer handles the result — [onStartCommand]
+         * The [observeConnectionState] flow observer handles the result — [onStartCommand]
          * does nothing for this action.
          */
         const val ACTION_CONNECT_SOCKET            = "com.andrerinas.headunitrevived.ACTION_CONNECT_SOCKET"
+
+        /** Max handshake failures on a stale accessory device before forcing AOA re-enumeration. */
+        private const val MAX_STALE_ACCESSORY_RETRIES = 1
+
+        /** Delay before retrying USB connection after an unexpected disconnect. */
+        private const val USB_RECONNECT_DELAY_MS = 3000L
     }
 }

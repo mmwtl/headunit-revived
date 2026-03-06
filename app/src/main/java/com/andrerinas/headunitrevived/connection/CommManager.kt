@@ -336,48 +336,21 @@ class CommManager(
     /** Sends a key press or release event to the phone. */
     fun send(keyCode: Int, isPress: Boolean) {
         if (_connectionState.value is ConnectionState.TransportStarted) {
-            try {
-                _scope.launch {
-                    _transport?.send(keyCode, isPress)
-                }
-            } catch (e: Exception) {
-                _scope.launch {
-                    _connectionState.emit(ConnectionState.Error("Send failed"))
-                    disconnect()
-                }
-            }
+            _transport?.send(keyCode, isPress)
         }
     }
 
     /** Sends a sensor event (e.g. driving status, night mode) to the phone. */
     fun send(sensor: SensorEvent) {
         if (_connectionState.value is ConnectionState.TransportStarted) {
-            try {
-                _scope.launch {
-                    _transport?.send(sensor)
-                }
-            } catch (e: Exception) {
-                _scope.launch {
-                    _connectionState.emit(ConnectionState.Error("Send failed"))
-                    disconnect()
-                }
-            }
+            _transport?.send(sensor)
         }
     }
 
     /** Sends a raw [AapMessage] (e.g. touch event, video focus request) to the phone. */
     fun send(message: AapMessage) {
         if (_connectionState.value is ConnectionState.TransportStarted) {
-            try {
-                _scope.launch {
-                    _transport?.send(message)
-                }
-            } catch (e: Exception) {
-                _scope.launch {
-                    _connectionState.emit(ConnectionState.Error("Send failed"))
-                    disconnect()
-                }
-            }
+            _transport?.send(message)
         }
     }
 
@@ -442,11 +415,7 @@ class CommManager(
      * After [destroy], the CommManager instance must not be used again.
      */
     fun destroy() {
-        _scope.launch {
-            withContext(Dispatchers.IO) {
-                doDisconnect()
-            }
-        }
+        doDisconnect()
         _scope.cancel()
     }
 }
