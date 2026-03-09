@@ -65,7 +65,7 @@ adb shell am start -a android.intent.action.VIEW -d "headunit://connect?ip=192.1
 - **Early MediaSession Initialization:** Fixes audio routing issues where the phone would sometimes play sound through its own speakers instead of the headunit.
 - **GPS Speed Fix:** Accurate speed reporting for navigation apps by correcting unit conversions.
 - **New Logging System:** Integrated log level control and file capture for easier debugging.
-- Fixing Android Auto 16.4 intents for selfmode. In Wireless Helper too. Please update to 1.2.0
+- **IMPORTANT** Fixing Android Auto 16.4 intents for selfmode. In Wireless Helper too. Please update to 1.2.0
 
 ### v.1.15.1
 - Added arabic language thanks to A5H0
