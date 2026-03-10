@@ -7,6 +7,7 @@ import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 
+import android.os.SystemClock
 import com.andrerinas.headunitrevived.utils.AppLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -188,9 +189,10 @@ class UsbAccessoryConnection(private val usbMgr: UsbManager, private val device:
     override val isSingleMessage: Boolean
         get() = false
 
-    // consecutiveReadErrors is only accessed by the poll thread; no lock needed.
+    // Read error tracking — only accessed by the poll thread; no lock needed.
     private var consecutiveReadErrors = 0
-    private val maxConsecutiveErrorsBeforeReset = 10
+    private var firstErrorTimeMs = 0L
+    private val maxErrorDurationBeforeDisconnect = 60_000L  // 60s patience for dongle WiFi recovery
 
     // Volatile reads capture the latest connection/endpoint references; bulkTransfer runs
     // entirely outside any lock. If disconnect() calls close() concurrently, bulkTransfer
@@ -236,19 +238,37 @@ class UsbAccessoryConnection(private val usbMgr: UsbManager, private val device:
 
                 if (read < 0) {
                     consecutiveReadErrors++
-                    if (consecutiveReadErrors >= maxConsecutiveErrorsBeforeReset) {
-                        AppLog.w("Too many read errors, attempting interface reset...")
-                        resetInterface()
-                        consecutiveReadErrors = 0
+                    if (consecutiveReadErrors == 1) {
+                        firstErrorTimeMs = SystemClock.elapsedRealtime()
+                    }
+                    val errorDurationMs = SystemClock.elapsedRealtime() - firstErrorTimeMs
+                    if (errorDurationMs > maxErrorDurationBeforeDisconnect) {
+                        AppLog.e("USB read errors persisting for ${errorDurationMs / 1000}s — disconnecting")
+                        disconnect()
+                        return -1
+                    }
+                    if (consecutiveReadErrors % 10 == 0) {
+                        AppLog.w("USB read errors ($consecutiveReadErrors) for ${errorDurationMs / 1000}s — waiting for recovery...")
+                    }
+                    if (consecutiveReadErrors >= 5) {
+                        try { Thread.sleep(200) } catch (_: InterruptedException) {}
                     }
                     return if (totalReturned > 0) totalReturned else -1
                 }
                 if (read == 0) {
-                    consecutiveReadErrors = 0
+                    if (consecutiveReadErrors > 0) {
+                        AppLog.i("USB reads recovered after $consecutiveReadErrors errors")
+                        consecutiveReadErrors = 0
+                        firstErrorTimeMs = 0
+                    }
                     return totalReturned
                 }
 
+                if (consecutiveReadErrors > 0) {
+                    AppLog.i("USB reads recovered after $consecutiveReadErrors errors")
+                }
                 consecutiveReadErrors = 0
+                firstErrorTimeMs = 0
                 internalBufferPos = 0
                 internalBufferAvailable = read
                 // Loop will continue and serve from the new internalBuffer data
