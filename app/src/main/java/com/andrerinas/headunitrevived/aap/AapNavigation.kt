@@ -36,7 +36,7 @@ class AapNavigation(
                     sendNavigationBroadcast(distanceMeters = null, timeSeconds = null, detail = detail)
                     if (settings.showNavigationNotifications) {
                         val actionText = nextEventToAction(detail.nextturn)
-                        val street = currentStreet.ifBlank { detail.road.takeIf { r -> r.isNotBlank() } ?: "" }.ifBlank { "—" }
+                        val street = currentStreet.ifBlank { "—" }
                         showNotification(distanceMeters = null, action = actionText, street = street)
                     }
                     true
