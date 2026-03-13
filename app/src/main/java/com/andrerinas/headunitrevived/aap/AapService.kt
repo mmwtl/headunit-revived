@@ -44,6 +44,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.atomic.AtomicBoolean
 import android.app.NotificationManager
+import android.content.pm.ServiceInfo
 import java.net.ServerSocket
 
 /**
@@ -424,35 +425,6 @@ class AapService : Service(), UsbReceiver.Listener {
             ContextCompat.RECEIVER_EXPORTED
         )
         AppLog.i("Registered runtime MEDIA_BUTTON receiver")
-    }
-
-    private fun registerNetworkMonitor() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val callback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                AppLog.i("NetworkMonitor: Network available: $network")
-            }
-            override fun onLost(network: Network) {
-                AppLog.w("NetworkMonitor: Network lost: $network")
-            }
-            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                AppLog.d("NetworkMonitor: Capabilities changed: $network → $caps")
-            }
-        }
-        networkCallback = callback
-        val request = NetworkRequest.Builder().build()
-        cm.registerNetworkCallback(request, callback)
-        AppLog.i("NetworkMonitor: Registered network change listener")
-    }
-
-    private fun unregisterNetworkMonitor() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
-        networkCallback?.let {
-            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            try { cm.unregisterNetworkCallback(it) } catch (e: IllegalArgumentException) { AppLog.w("Network callback not registered or already unregistered", e) }
-            networkCallback = null
-        }
     }
 
     private fun registerNetworkMonitor() {

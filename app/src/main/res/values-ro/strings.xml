@@ -193,6 +193,7 @@
         <item>Microfon</item>
         <item>Recunoaștere vocală</item>
         <item>Comunicații vocale</item>
+        <item>Cască Bluetooth (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -263,6 +264,8 @@
     <string name="shortcut_connect_desc">Conectează ultimul dispozitiv știut</string>
     <string name="shortcut_disconnect_title">Deconectare</string>
     <string name="shortcut_disconnect_desc">Oprește sesiunea curentă</string>
+    <string name="shortcut_exit_title">Închide aplicația</string>
+    <string name="shortcut_exit_desc">Opriți toate serviciile și închideți aplicația</string>
     <string name="shortcut_night_mode_auto_title">Mod: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Revino la modul de noapte automat</string>
     <string name="shortcut_night_mode_day_title">Mod: Zi</string>

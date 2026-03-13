@@ -184,6 +184,7 @@
         <item>Микрофон</item>
         <item>Распознавание речи</item>
         <item>Голосовая связь</item>
+        <item>Bluetooth-гарнитура (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->

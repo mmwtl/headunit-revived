@@ -183,6 +183,7 @@
         <item>Mikrofon</item>
         <item>Hangfelismerő</item>
         <item>Hangkommunikáció</item>
+        <item>Bluetooth headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->

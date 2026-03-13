@@ -184,6 +184,7 @@
         <item>Micrófono</item>
         <item>Reconocimiento de voz</item>
         <item>Comunicación de voz</item>
+        <item>Auriculares Bluetooth (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->

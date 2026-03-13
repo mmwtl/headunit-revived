@@ -183,6 +183,7 @@
         <item>麥克風</item>
         <item>語音辨識</item>
         <item>語音通訊</item>
+        <item>藍牙耳機 (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->

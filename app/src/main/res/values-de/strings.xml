@@ -187,6 +187,7 @@
         <item>Mikrofon</item>
         <item>Spracherkennung</item>
         <item>Sprachkommunikation</item>
+        <item>Bluetooth-Headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->

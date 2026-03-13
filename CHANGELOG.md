@@ -5,8 +5,11 @@
 - Added: Support for Media Button emulation (SWC improvement for MacroDroid etc.)
 - Added: App shortcut and deep link for full app exit (headunit://exit)
 - Added: Improved Wi-Fi Direct reliability with recursive discovery and ping handoff
-- Added: Navigation Status Service. Thanks to @Bastel2020
-- Added: Romanian translation 🇷🇴. Thanks to @LeeWiu
+- Added: Romanian translation 🇷🇴, thanks to @LeeWiu
+- Merged PR #189: Adding navigation message handling, thanks to @Bastel2020
+- Merged PR #215: Fix USB reconnect race and stale dongle data after AA exit, thanks to @andrecuellar
+- Merged PR #205: Fix wireless dongle disconnect on network changes, thanks to @andrecuellar
+- Merged PR #216: Add Bluetooth SCO microphone support, thanks to tgigli
 
 ### v.2.0.0
 - Added Wi-Fi Direct (P2P): Support. Connect your phone to the headunit without a shared network or hotspot. The headunit now automatically becomes visible as a P2P peer.
@@ -18,17 +21,11 @@
 - **IMPORTANT** Fixing Android Auto 16.4 intents for selfmode. In Wireless Helper too. Please update to 1.2.0
 
 ### v.1.15.1
-- Added arabic language thanks to A5H0
-- Added new intent for setting day/night mode for maps
-- Added new window flags for older devices to finally fix fullscreen issues
-- Added new intents to make the headunit recognize the app as navigation app
-- Added LegacyOptimizer which will handle things directly and faster for single core cpus. Should improve the performance on Android 4.1 - 4.4 Devices
-- Fixed BT Permission Bug
-- Changed the Twilight-Calculator for better switch to day/night on auto mode to prevent to bright display
-- Added more mediasession logic to gain audio focus and audio routing
-- Merged Retry Button on connect screen, thanks to @andrecuellar
-- Merged auto connect usb feature, thanks to @andrecuellar
-- Fixed GPS Speed: Accurate speed reporting for navigation apps by correcting unit conversions.
+- New Feature: Added Auto-Optimization Wizard to automatically find the best Resolution, DPI, and Codec settings for your hardware.
+- Bugfix: Fixed Self Mode failing to start in offline/hotspot scenarios (Network ID 0 fix).
+- Bugfix: Improved Audio Routing. The phone is now more likely to route audio to the headunit immediately upon connection by using an early-initialized MediaSession with remote playback metadata.
+- Bugfix: Fixed GPS Speed calculation. Speeds were previously doubled due to an incorrect unit conversion (knots instead of mm/s).
+- UI: Improved Settings readability on small screens by allowing multi-line descriptions.
 
 ### v.1.15.0
 - Added arabic language thanks to A5H0

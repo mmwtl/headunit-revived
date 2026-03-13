@@ -183,6 +183,7 @@
         <item>Microfoon</item>
         <item>Spraakherkenning</item>
         <item>Spraakcommunicatie</item>
+        <item>Bluetooth-headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
