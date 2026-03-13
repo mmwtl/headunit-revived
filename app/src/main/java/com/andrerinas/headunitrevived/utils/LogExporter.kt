@@ -27,6 +27,9 @@ object LogExporter {
     private var captureProcess: Process? = null
     private var captureThread: Thread? = null
     private var captureFile: File? = null
+    private var captureVerbosity: LogLevel = LogLevel.DEBUG
+    private var captureRestarts = 0
+    private const val MAX_RESTARTS = 5
 
     val isCapturing: Boolean get() = captureProcess != null
 
@@ -65,20 +68,36 @@ object LogExporter {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val file = File(logDir, "HUR_Log_$timeStamp.txt")
         captureFile = file
+        captureVerbosity = verbosity
+        captureRestarts = 0
 
+        launchLogcatPipe(file, verbosity)
+    }
+
+    /**
+     * Spawns a logcat process piping stdout into [file] (append mode).
+     * When the process exits unexpectedly, restarts automatically up to [MAX_RESTARTS] times
+     * so a system-killed logcat doesn't silently stop the capture.
+     */
+    private fun launchLogcatPipe(file: File, verbosity: LogLevel) {
         try {
             val process = Runtime.getRuntime().exec(
                 arrayOf("logcat", "-v", "threadtime", verbosity.filter)
             )
             captureProcess = process
-            // On Android 4.4, logcat's -f flag may not write to app-owned paths.
-            // Pipe stdout into the file from a background thread instead.
             captureThread = Thread {
                 try {
-                    FileOutputStream(file).use { out ->
+                    FileOutputStream(file, true).use { out ->
                         process.inputStream.copyTo(out)
                     }
                 } catch (_: IOException) { }
+                // copyTo returned — logcat process died or was intentionally stopped
+                if (captureProcess === process && captureRestarts < MAX_RESTARTS) {
+                    captureRestarts++
+                    AppLog.w("Log capture process exited, restarting (attempt $captureRestarts/$MAX_RESTARTS)")
+                    try { Thread.sleep(2000) } catch (_: InterruptedException) { return@Thread }
+                    launchLogcatPipe(file, verbosity)
+                }
             }.also { it.isDaemon = true; it.start() }
         } catch (e: IOException) {
             AppLog.e("Failed to start log capture", e)
@@ -106,7 +125,6 @@ object LogExporter {
 
         val source = captureFile
         if (source != null && source.exists() && source.length() > 0) {
-            captureFile = null
             return source
         }
 

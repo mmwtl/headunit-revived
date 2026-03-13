@@ -252,6 +252,9 @@
     <string name="failed">Eșuat</string>
     <string name="failed_start_android_auto">Pornirea Android Auto a eșuat</string>
     <string name="android_auto_starting">Android Auto pornește…</string>
+    <string name="connection_interrupted">Conexiune pierdută</string>
+    <string name="connection_interrupted_detail">Se reîncearcă…</string>
+    <string name="wifi_disconnect_toast">Dacă folosiți AA wireless, dezactivați \"Comutare între rețele\" sau \"Accelerare rețea\" în setările WiFi ale telefonului</string>
     <string name="reset_usb_option">Resetează conexiunea USB</string>
     <string name="reset_usb_timeout">Dispozitivul USB nu a fost găsit. Verifică conexiunea.</string>
     <string name="notification_service_running">Headunit Revived rulează</string>

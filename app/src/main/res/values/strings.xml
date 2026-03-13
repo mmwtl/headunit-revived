@@ -252,6 +252,9 @@
     <string name="failed">Failed</string>
     <string name="failed_start_android_auto">Failed to start Android Auto</string>
     <string name="android_auto_starting">Android Auto is starting…</string>
+    <string name="connection_interrupted">Connection lost</string>
+    <string name="connection_interrupted_detail">Retrying…</string>
+    <string name="wifi_disconnect_toast">If using wireless AA, disable \"Switch between networks\" or \"Network acceleration\" in phone WiFi settings</string>
     <string name="reset_usb_option">Reset USB Connection</string>
     <string name="reset_usb_timeout">USB device not found. Please check connection.</string>
     <string name="notification_service_running">Headunit Revived is running</string>

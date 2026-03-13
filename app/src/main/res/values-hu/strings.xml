@@ -242,6 +242,9 @@
     <string name="failed">Sikertelen</string>
     <string name="failed_start_android_auto">Az Android Auto indítása sikertelen</string>
     <string name="android_auto_starting">Az Android Auto indul…</string>
+    <string name="connection_interrupted">Kapcsolat elveszett</string>
+    <string name="connection_interrupted_detail">Újrapróbálkozás…</string>
+    <string name="wifi_disconnect_toast">Ha vezeték nélküli AA-t használ, tiltsa le a \"Hálózatok közötti váltás\" vagy \"Hálózatgyorsítás\" opciót a telefon WiFi beállításaiban</string>
     <string name="notification_service_running">Headunit Revived fut</string>
     <string name="notification_projection_active">Android Auto kivetítve</string>
     <string name="shortcut_connect_title">Kapcsolódás</string>

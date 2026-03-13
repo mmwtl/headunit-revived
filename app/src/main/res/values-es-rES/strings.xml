@@ -98,10 +98,10 @@
     <string name="key_media_next">Siguiente pista</string>
     <string name="key_media_prev">Pista anterior</string>
     <string name="key_search">Comando de voz</string>
-    <string name="key_call">Teléfono</string>
+    <string name="key_call">Llamada</string>
     <string name="key_music">Música</string>
-    <string name="key_nav">Navegação</string>
-    <string name="key_night">Alternar modo noite</string>
+    <string name="key_nav">Navegación</string>
+    <string name="key_night">Alternar modo noche</string>
 
     <!-- Language Settings -->
     <string name="app_language">Idioma de la aplicación</string>
@@ -243,6 +243,9 @@
     <string name="failed">Fallo</string>
     <string name="failed_start_android_auto">Error al iniciar Android Auto</string>
     <string name="android_auto_starting">Iniciando Android Auto…</string>
+    <string name="connection_interrupted">Conexión perdida</string>
+    <string name="connection_interrupted_detail">Reintentando…</string>
+    <string name="wifi_disconnect_toast">Si usas AA inalámbrico, desactiva \"Cambiar entre redes\" o \"Aceleración de red\" en ajustes WiFi del móvil</string>
     <string name="notification_service_running">Headunit Revived ejecutándose</string>
     <string name="notification_projection_active">Android Auto proyectado</string>
     <string name="shortcut_connect_title">Conectar</string>
@@ -263,7 +266,7 @@
     <string name="setup_welcome_msg">Este asistente te ayuda a elegir la mejor configuración para una experiencia fluida con Android Auto.\n\nSiempre puedes cambiar estos ajustes más tarde o reiniciar este asistente desde la configuración de la aplicación.</string>
     <string name="setup_start">Comenzar</string>
     <string name="setup_size_title">Tamaño de pantalla</string>
-    <string name="setup_size_phone">Teléfono / Pequeño (4-6\")</string>
+    <string name="setup_size_phone">Móvil / Pequeño (4-6\")</string>
     <string name="setup_size_small">Tablet pequeña (7-8\")</string>
     <string name="setup_size_standard">Estándar (9-10\")</string>
     <string name="setup_size_large">Grande (11\"+)</string>

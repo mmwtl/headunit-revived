@@ -10,7 +10,9 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.TextureView
 import android.view.View
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
@@ -39,10 +41,13 @@ import com.andrerinas.headunitrevived.utils.SystemUI
 
 class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, VideoDimensionsListener {
 
+    private enum class OverlayState { STARTING, RECONNECTING, HIDDEN }
+
     private lateinit var projectionView: IProjectionView
     private val videoDecoder: VideoDecoder by lazy { App.provide(this).videoDecoder }
     private val settings: Settings by lazy { Settings(this) }
     private var isSurfaceSet = false
+    private var overlayState = OverlayState.STARTING
     private val watchdogHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     private val videoWatchdogRunnable = object : Runnable {
@@ -53,6 +58,24 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
                 commManager.send(VideoFocusEvent(gain = true, unsolicited = true))
                 watchdogHandler.postDelayed(this, 3000)
             }
+        }
+    }
+    private val reconnectingWatchdog = object : Runnable {
+        override fun run() {
+            if (!commManager.isConnected) return
+            val lastFrame = videoDecoder.lastFrameRenderedMs
+            if (lastFrame == 0L) {
+                // First frame hasn't arrived yet — handled by the starting overlay
+                watchdogHandler.postDelayed(this, 2000)
+                return
+            }
+            val gap = SystemClock.elapsedRealtime() - lastFrame
+            if (overlayState == OverlayState.HIDDEN && gap > 10000) {
+                showReconnectingOverlay()
+            } else if (overlayState == OverlayState.RECONNECTING && gap < 2000) {
+                hideReconnectingOverlay()
+            }
+            watchdogHandler.postDelayed(this, 2000)
         }
     }
     private val watchdogRunnable = Runnable {
@@ -130,7 +153,13 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 commManager.connectionState.collect { state ->
                     when (state) {
-                        is CommManager.ConnectionState.Disconnected -> finish()
+                        is CommManager.ConnectionState.Disconnected -> {
+                            if (!state.isClean) {
+                                Toast.makeText(this@AapProjectionActivity, getString(R.string.wifi_disconnect_toast), Toast.LENGTH_LONG).show()
+                            }
+                            hideReconnectingOverlay()
+                            finish()
+                        }
                         is CommManager.ConnectionState.HandshakeComplete -> {
                             // Handshake done. If the surface is already ready (e.g. reconnect
                             // while the activity is in the foreground), start reading immediately.
@@ -208,10 +237,15 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         val loadingOverlay = findViewById<View>(R.id.loading_overlay)
         // Ensure loading overlay is on top of everything
         loadingOverlay?.bringToFront()
-        
+
+        findViewById<Button>(R.id.disconnect_button)?.setOnClickListener {
+            commManager.disconnect()
+        }
+
         videoDecoder.onFirstFrameListener = {
             runOnUiThread {
                 loadingOverlay?.visibility = View.GONE
+                overlayState = OverlayState.HIDDEN
             }
         }
     }
@@ -221,6 +255,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         super.onPause()
         watchdogHandler.removeCallbacks(watchdogRunnable)
         watchdogHandler.removeCallbacks(videoWatchdogRunnable)
+        watchdogHandler.removeCallbacks(reconnectingWatchdog)
         unregisterReceiver(keyCodeReceiver)
     }
 
@@ -229,6 +264,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         super.onResume()
         watchdogHandler.postDelayed(watchdogRunnable, 2000)
         watchdogHandler.postDelayed(videoWatchdogRunnable, 3000)
+        watchdogHandler.postDelayed(reconnectingWatchdog, 5000)
 
         // Register key event receiver safely for Android 14+
         ContextCompat.registerReceiver(this, keyCodeReceiver, IntentFilters.keyEvent, ContextCompat.RECEIVER_NOT_EXPORTED)
@@ -249,6 +285,31 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         if (hasFocus) {
             setFullscreen() // Reapply fullscreen mode if window gains focus
         }
+    }
+
+    private fun showReconnectingOverlay() {
+        AppLog.i("Showing reconnecting overlay")
+        overlayState = OverlayState.RECONNECTING
+        val overlay = findViewById<View>(R.id.loading_overlay) ?: return
+        val title = findViewById<TextView>(R.id.overlay_text)
+        val detail = findViewById<TextView>(R.id.overlay_detail)
+        val button = findViewById<Button>(R.id.disconnect_button)
+        overlay.visibility = View.VISIBLE
+        title?.text = getString(R.string.connection_interrupted)
+        detail?.text = getString(R.string.connection_interrupted_detail)
+        detail?.visibility = View.VISIBLE
+        button?.visibility = View.VISIBLE
+    }
+
+    private fun hideReconnectingOverlay() {
+        AppLog.i("Hiding reconnecting overlay — frames resumed")
+        overlayState = OverlayState.HIDDEN
+        val overlay = findViewById<View>(R.id.loading_overlay) ?: return
+        val detail = findViewById<TextView>(R.id.overlay_detail)
+        val button = findViewById<Button>(R.id.disconnect_button)
+        overlay.visibility = View.GONE
+        detail?.visibility = View.GONE
+        button?.visibility = View.GONE
     }
 
     private fun setFullscreen() {
