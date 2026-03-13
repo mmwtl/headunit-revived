@@ -76,7 +76,10 @@ class CommManager(
          *                `false` for all other disconnect causes (USB detach, read error,
          *                socket timeout, explicit user disconnect).
          */
-        data class Disconnected(val isClean: Boolean = false) : ConnectionState()
+        data class Disconnected(
+            val isClean: Boolean = false,
+            val isUserExit: Boolean = false
+        ) : ConnectionState()
 
         /** Physical connection handshake in progress (USB open or TCP connect). */
         object Connecting : ConnectionState()
@@ -104,6 +107,9 @@ class CommManager(
     private val _scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _connectionState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected())
+
+    /** Callback for audio focus state changes (isPlaying). Set by AapService. */
+    var onAudioFocusStateChanged: ((Boolean) -> Unit)? = null
 
     /** @Volatile: written on IO thread, read on Main and IO threads. */
     @Volatile private var _transport: AapTransport? = null
@@ -269,6 +275,7 @@ class CommManager(
                     val audioManager = context.getSystemService(Application.AUDIO_SERVICE) as AudioManager
                     _transport = AapTransport(audioDecoder, videoDecoder, audioManager, settings, _backgroundNotification, context, externalSsl = aapSslContext)
                     _transport!!.onQuit = { isClean -> transportedQuited(isClean) }
+                    _transport!!.onAudioFocusStateChanged = { isPlaying -> onAudioFocusStateChanged?.invoke(isPlaying) }
                 }
                 if (_transport?.startHandshake(_connection!!) == true) {
                     _connectionState.emit(ConnectionState.HandshakeComplete)
@@ -324,7 +331,8 @@ class CommManager(
      * connection is already dead — there is no point sending a `ByeByeRequest`.
      */
     private fun transportedQuited(isClean: Boolean) {
-        _connectionState.value = ConnectionState.Disconnected(isClean)
+        val wasUserExit = _transport?.wasUserExit ?: false
+        _connectionState.value = ConnectionState.Disconnected(isClean, isUserExit = wasUserExit)
         // Transport already quit on its own — no ByeByeRequest needed (connection is dead).
         _disconnectJob = _scope.launch { doDisconnect(sendByeBye = false) }
     }

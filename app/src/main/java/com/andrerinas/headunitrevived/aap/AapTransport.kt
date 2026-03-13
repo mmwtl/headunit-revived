@@ -99,6 +99,8 @@ class AapTransport(
     private var aapRead: AapRead? = null
     var isQuittingAllowed: Boolean = false
     var ignoreNextStopRequest: Boolean = false
+    /** Set by [AapControl] when VIDEO_FOCUS_NATIVE triggers a stop (user tapped Exit). */
+    @Volatile var wasUserExit: Boolean = false
     @Volatile var onQuit: ((Boolean) -> Unit)? = null
     var onAudioFocusStateChanged: ((Boolean) -> Unit)? = null
     private var pollHandler: Handler? = null
@@ -205,6 +207,7 @@ class AapTransport(
     internal fun startHandshake(connection: AccessoryConnection): Boolean {
         AppLog.i("Start Aap transport handshake for $connection")
         this.connection = connection
+        wasUserExit = false
 
         sendThread = HandlerThread("AapTransport:Handler::Send", Process.THREAD_PRIORITY_AUDIO)
         sendThread!!.start()
@@ -256,6 +259,19 @@ class AapTransport(
             // Increased delay for AA 16.4+ stability
             SystemClock.sleep(500)
             val buffer = ByteArray(Messages.DEF_BUFFER_LENGTH)
+
+            // Drain any stale data left in the USB pipe from a previous session
+            // (e.g. old TLS records after a dongle reconnect). Short timeout so we
+            // don't block if the pipe is already clean.
+            var drained = 0
+            while (true) {
+                val n = connection.recvBlocking(buffer, buffer.size, 50, false)
+                if (n <= 0) break
+                drained += n
+            }
+            if (drained > 0) {
+                AppLog.i("Handshake: Drained $drained bytes of stale data before version request")
+            }
 
             AppLog.d("Handshake: Starting version request. TS: ${SystemClock.elapsedRealtime()}")
             val version = Messages.versionRequest

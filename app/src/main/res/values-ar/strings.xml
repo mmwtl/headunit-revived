@@ -184,6 +184,7 @@
         <item>ميكروفون</item>
         <item>التعرف على الصوت</item>
         <item>الاتصال الصوتي</item>
+        <item>سماعة بلوتوث (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -243,12 +244,17 @@
     <string name="failed">فشل</string>
     <string name="failed_start_android_auto">فشل تشغيل Android Auto</string>
     <string name="android_auto_starting">جار تشغيل Android Auto…</string>
+    <string name="connection_interrupted">فُقد الاتصال</string>
+    <string name="connection_interrupted_detail">جارٍ إعادة المحاولة…</string>
+    <string name="wifi_disconnect_toast">إذا كنت تستخدم AA لاسلكي، عطّل \"التبديل بين الشبكات\" أو \"تسريع الشبكة\" في إعدادات WiFi الهاتف</string>
     <string name="notification_service_running">Headunit Revived يعمل</string>
     <string name="notification_projection_active">Android Auto قيد الإسقاط</string>
     <string name="shortcut_connect_title">اتصال</string>
     <string name="shortcut_connect_desc">الاتصال بآخر جهاز معروف</string>
     <string name="shortcut_disconnect_title">قطع الاتصال</string>
     <string name="shortcut_disconnect_desc">إنهاء الجلسة الحالية</string>
+    <string name="shortcut_exit_title">إغلاق التطبيق</string>
+    <string name="shortcut_exit_desc">إيقاف جميع الخدمات وإغلاق التطبيق</string>
     <string name="shortcut_night_mode_auto_title">الوضع: تلقائي</string>
     <string name="shortcut_night_mode_auto_desc">استعادة الوضع الليلي التلقائي</string>
     <string name="shortcut_night_mode_day_title">الوضع: نهاري</string>
@@ -282,4 +288,29 @@
     <string name="start_log_capture_description">Begins recording system logs to a file.</string>
     <string name="stop_log_capture">Stop log capture</string>
     <string name="stop_log_capture_description">Stops recording and saves the log file.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">إشعارات الملاحة</string>
+    <string name="show_navigation_notifications_description">عرض "بعد X متر Y" والشارع الحالي في الإشعارات (للتصحيح)</string>
+    <string name="nav_notification_channel_name">الملاحة</string>
+    <string name="nav_notification_channel_description">توجيهات الملاحة من Android Auto</string>
+    <string name="nav_notification_title_format">بعد %1$d م — %2$s</string>
+    <string name="nav_notification_street_format">الشارع: %1$s</string>
+    <string name="nav_action_unknown">إجراء</string>
+    <string name="nav_action_depart">انطلاق</string>
+    <string name="nav_action_name_change">تغيير الاسم</string>
+    <string name="nav_action_slight_turn">انعطاف خفيف</string>
+    <string name="nav_action_turn">انعطاف</string>
+    <string name="nav_action_sharp_turn">انعطاف حاد</string>
+    <string name="nav_action_uturn">دوران</string>
+    <string name="nav_action_on_ramp">مدخل الطريق</string>
+    <string name="nav_action_off_ramp">مخرج الطريق</string>
+    <string name="nav_action_merge">اندماج</string>
+    <string name="nav_action_roundabout_enter">دخول الدوار</string>
+    <string name="nav_action_roundabout_exit">خروج من الدوار</string>
+    <string name="nav_action_roundabout">دوار</string>
+    <string name="nav_action_straight">مباشرة</string>
+    <string name="nav_action_ferry">عبّارة</string>
+    <string name="nav_action_ferry_train">عبّارة / قطار</string>
+    <string name="nav_action_destination">وصول</string>
 </resources>

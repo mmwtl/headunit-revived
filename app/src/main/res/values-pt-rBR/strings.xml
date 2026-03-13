@@ -180,10 +180,11 @@
     <string name="mic_input_source">Fonte de entrada do microfone</string>
     <string name="mic_input_source_description">Escolha a fonte de áudio para o microfone.</string>
     <string-array name="mic_input_sources">
-        <item>Padrão</item>
-        <item>Microfone</item>
-        <item>Reconhecimento de voz</item>
-        <item>Comunicação de voz</item>
+        <item>Padrão (sistema decide)</item>
+        <item>Microfone embutido (entrada bruta)</item>
+        <item>Reconhecimento de voz (redução de ruído)</item>
+        <item>Comunicação de voz (cancelamento de eco e ruído)</item>
+        <item>Fone Bluetooth (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -243,6 +244,9 @@
     <string name="failed">Falha</string>
     <string name="failed_start_android_auto">Falha ao iniciar Android Auto</string>
     <string name="android_auto_starting">Android Auto está iniciando…</string>
+    <string name="connection_interrupted">Conexão perdida</string>
+    <string name="connection_interrupted_detail">Tentando novamente…</string>
+    <string name="wifi_disconnect_toast">Se usar AA sem fio, desative \"Alternar entre redes\" ou \"Aceleração de rede\" nas configurações WiFi do telefone</string>
     <string name="reset_usb_option">Redefinir conexão USB</string>
     <string name="reset_usb_timeout">Dispositivo USB não encontrado. Verifique a conexão.</string>
     <string name="notification_service_running">Headunit Revived está em execução</string>
@@ -251,6 +255,8 @@
     <string name="shortcut_connect_desc">Conectar ao último dispositivo conhecido</string>
     <string name="shortcut_disconnect_title">Desconectar</string>
     <string name="shortcut_disconnect_desc">Encerrar sessão atual</string>
+    <string name="shortcut_exit_title">Sair do aplicativo</string>
+    <string name="shortcut_exit_desc">Parar todos os servicios e fechar o aplicativo</string>
     <string name="shortcut_night_mode_auto_title">Modo: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Restaurar modo noturno automático</string>
     <string name="shortcut_night_mode_day_title">Modo: Dia</string>
@@ -282,4 +288,29 @@
     <string name="start_log_capture_description">Começa a registrar os logs do sistema em um arquivo.</string>
     <string name="stop_log_capture">Parar captura de log</string>
     <string name="stop_log_capture_description">Interrompe a gravação e salva o arquivo de log.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">Notificações de navegação</string>
+    <string name="show_navigation_notifications_description">Mostrar "Em X metros Y" e a rua atual nas notificações (para depuração)</string>
+    <string name="nav_notification_channel_name">Navegação</string>
+    <string name="nav_notification_channel_description">Indicações passo a passo do Android Auto</string>
+    <string name="nav_notification_title_format">Em %1$d m — %2$s</string>
+    <string name="nav_notification_street_format">Rua: %1$s</string>
+    <string name="nav_action_unknown">Ação</string>
+    <string name="nav_action_depart">Partir</string>
+    <string name="nav_action_name_change">Mudança de nome</string>
+    <string name="nav_action_slight_turn">Curva leve</string>
+    <string name="nav_action_turn">Curva</string>
+    <string name="nav_action_sharp_turn">Curva fechada</string>
+    <string name="nav_action_uturn">Retorno</string>
+    <string name="nav_action_on_ramp">Entrada</string>
+    <string name="nav_action_off_ramp">Saída</string>
+    <string name="nav_action_merge">Junção</string>
+    <string name="nav_action_roundabout_enter">Entrar na rotatória</string>
+    <string name="nav_action_roundabout_exit">Sair da rotatória</string>
+    <string name="nav_action_roundabout">Rotatória</string>
+    <string name="nav_action_straight">Em frente</string>
+    <string name="nav_action_ferry">Balsa</string>
+    <string name="nav_action_ferry_train">Balsa / trem</string>
+    <string name="nav_action_destination">Chegada</string>
 </resources>

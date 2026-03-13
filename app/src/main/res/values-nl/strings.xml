@@ -183,6 +183,7 @@
         <item>Microfoon</item>
         <item>Spraakherkenning</item>
         <item>Spraakcommunicatie</item>
+        <item>Bluetooth-headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -242,6 +243,9 @@
     <string name="failed">Mislukt</string>
     <string name="failed_start_android_auto">Starten van Android Auto mislukt</string>
     <string name="android_auto_starting">Android Auto start op…</string>
+    <string name="connection_interrupted">Verbinding verloren</string>
+    <string name="connection_interrupted_detail">Opnieuw proberen…</string>
+    <string name="wifi_disconnect_toast">Bij draadloze AA, schakel \"Wisselen tussen netwerken\" of \"Netwerkversnelling\" uit in WiFi-instellingen van telefoon</string>
     <string name="reset_usb_option">USB-verbinding resetten</string>
     <string name="reset_usb_timeout">USB-apparaat niet gevonden. Controleer de verbinding.</string>
     <string name="notification_service_running">Headunit Revived is actief</string>
@@ -250,6 +254,8 @@
     <string name="shortcut_connect_desc">Verbinden met laatst bekende apparaat</string>
     <string name="shortcut_disconnect_title">Verbinding verbreken</string>
     <string name="shortcut_disconnect_desc">Beëindig huidige sessie</string>
+    <string name="shortcut_exit_title">App afsluiten</string>
+    <string name="shortcut_exit_desc">Alle services stoppen und app sluiten</string>
     <string name="shortcut_night_mode_auto_title">Modus: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Herstel automatische nachtmodus</string>
     <string name="shortcut_night_mode_day_title">Modus: Dag</string>
@@ -281,4 +287,29 @@
     <string name="start_log_capture_description">Begins recording system logs to a file.</string>
     <string name="stop_log_capture">Stop log capture</string>
     <string name="stop_log_capture_description">Stops recording and saves the log file.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">Navigatiemeldingen</string>
+    <string name="show_navigation_notifications_description">Toon "Over X meter Y" en huidige straat in meldingen (voor foutopsporing)</string>
+    <string name="nav_notification_channel_name">Navigatie</string>
+    <string name="nav_notification_channel_description">Afslag-voor-afslag navigatie van Android Auto</string>
+    <string name="nav_notification_title_format">Over %1$d m — %2$s</string>
+    <string name="nav_notification_street_format">Straat: %1$s</string>
+    <string name="nav_action_unknown">Actie</string>
+    <string name="nav_action_depart">Vertrekken</string>
+    <string name="nav_action_name_change">Naamswijziging</string>
+    <string name="nav_action_slight_turn">Licht afslaan</string>
+    <string name="nav_action_turn">Afslaan</string>
+    <string name="nav_action_sharp_turn">Scherp afslaan</string>
+    <string name="nav_action_uturn">Keren</string>
+    <string name="nav_action_on_ramp">Oprit</string>
+    <string name="nav_action_off_ramp">Afrit</string>
+    <string name="nav_action_merge">Invoegen</string>
+    <string name="nav_action_roundabout_enter">Rotonde oprijden</string>
+    <string name="nav_action_roundabout_exit">Rotonde verlaten</string>
+    <string name="nav_action_roundabout">Rotonde</string>
+    <string name="nav_action_straight">Rechtdoor</string>
+    <string name="nav_action_ferry">Veerboot</string>
+    <string name="nav_action_ferry_train">Veerboot / trein</string>
+    <string name="nav_action_destination">Aankomst</string>
     </resources>

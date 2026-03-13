@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="night_mode">
+        <item>Auto (Răsărit/Apus)</item>
+        <item>Zi</item>
+        <item>Noapte</item>
+        <item>Oră manuală</item>
+        <item>Senzor de lumină</item>
+        <item>Luminozitate ecran</item>
+    </string-array>
+</resources>

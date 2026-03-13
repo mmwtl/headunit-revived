@@ -183,6 +183,7 @@
         <item>Mikrofon</item>
         <item>Hangfelismerő</item>
         <item>Hangkommunikáció</item>
+        <item>Bluetooth headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -242,12 +243,17 @@
     <string name="failed">Sikertelen</string>
     <string name="failed_start_android_auto">Az Android Auto indítása sikertelen</string>
     <string name="android_auto_starting">Az Android Auto indul…</string>
+    <string name="connection_interrupted">Kapcsolat elveszett</string>
+    <string name="connection_interrupted_detail">Újrapróbálkozás…</string>
+    <string name="wifi_disconnect_toast">Ha vezeték nélküli AA-t használ, tiltsa le a \"Hálózatok közötti váltás\" vagy \"Hálózatgyorsítás\" opciót a telefon WiFi beállításaiban</string>
     <string name="notification_service_running">Headunit Revived fut</string>
     <string name="notification_projection_active">Android Auto kivetítve</string>
     <string name="shortcut_connect_title">Kapcsolódás</string>
     <string name="shortcut_connect_desc">Kapcsolódás az utolsó ismert eszközhöz</string>
     <string name="shortcut_disconnect_title">Leválasztás</string>
     <string name="shortcut_disconnect_desc">Az aktuális munkamenet befejezése</string>
+    <string name="shortcut_exit_title">Kilépés az alkalmazásból</string>
+    <string name="shortcut_exit_desc">Összes szolgáltatás leállítása és kilépés</string>
     <string name="shortcut_night_mode_auto_title">Mód: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Automatikus éjszakai mód visszaállítása</string>
     <string name="shortcut_night_mode_day_title">Mód: Nappali</string>
@@ -281,4 +287,29 @@
     <string name="start_log_capture_description">Begins recording system logs to a file.</string>
     <string name="stop_log_capture">Stop log capture</string>
     <string name="stop_log_capture_description">Stops recording and saves the log file.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">Navigációs értesítések</string>
+    <string name="show_navigation_notifications_description">„X méter múlva Y" és az aktuális utca megjelenítése az értesítésekben (hibakereséshez)</string>
+    <string name="nav_notification_channel_name">Navigáció</string>
+    <string name="nav_notification_channel_description">Részletes navigációs utasítások az Android Auto-tól</string>
+    <string name="nav_notification_title_format">%1$d m múlva — %2$s</string>
+    <string name="nav_notification_street_format">Utca: %1$s</string>
+    <string name="nav_action_unknown">Művelet</string>
+    <string name="nav_action_depart">Indulás</string>
+    <string name="nav_action_name_change">Névváltás</string>
+    <string name="nav_action_slight_turn">Enyhe kanyar</string>
+    <string name="nav_action_turn">Kanyar</string>
+    <string name="nav_action_sharp_turn">Éles kanyar</string>
+    <string name="nav_action_uturn">Megfordulás</string>
+    <string name="nav_action_on_ramp">Felhajtó</string>
+    <string name="nav_action_off_ramp">Lehajtó</string>
+    <string name="nav_action_merge">Besorolás</string>
+    <string name="nav_action_roundabout_enter">Körforgalomba behajtás</string>
+    <string name="nav_action_roundabout_exit">Körforgalom elhagyása</string>
+    <string name="nav_action_roundabout">Körforgalom</string>
+    <string name="nav_action_straight">Egyenesen</string>
+    <string name="nav_action_ferry">Komp</string>
+    <string name="nav_action_ferry_train">Komp / vonat</string>
+    <string name="nav_action_destination">Megérkezés</string>
 </resources>

@@ -47,6 +47,7 @@ internal class AapControlMedia(
 
                 if (focusRequest.mode == Media.VideoFocusMode.VIDEO_FOCUS_NATIVE) {
                     AppLog.i("Video Focus NATIVE received. User likely clicked Exit. Stopping transport.")
+                    aapTransport.wasUserExit = true
                     aapTransport.stop()
                 }
                 return 0

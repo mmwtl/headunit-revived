@@ -4,19 +4,21 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.app.UiModeManager
-import android.content.pm.ServiceInfo
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.net.wifi.WifiManager
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.IBinder
-import android.os.SystemClock
 import android.os.Parcel
 import android.os.Parcelable
 import android.widget.Toast
@@ -29,18 +31,20 @@ import com.andrerinas.headunitrevived.connection.CommManager
 import com.andrerinas.headunitrevived.connection.NetworkDiscovery
 import com.andrerinas.headunitrevived.connection.WifiDirectManager
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.media.session.MediaButtonReceiver
 import com.andrerinas.headunitrevived.connection.UsbAccessoryMode
 import com.andrerinas.headunitrevived.connection.UsbDeviceCompat
 import com.andrerinas.headunitrevived.connection.UsbReceiver
 import com.andrerinas.headunitrevived.location.GpsLocationService
 import com.andrerinas.headunitrevived.utils.AppLog
-import com.andrerinas.headunitrevived.utils.DeviceIntent
 import com.andrerinas.headunitrevived.utils.LocaleHelper
+import com.andrerinas.headunitrevived.utils.LogExporter
 import com.andrerinas.headunitrevived.utils.NightModeManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.atomic.AtomicBoolean
 import android.app.NotificationManager
+import android.content.pm.ServiceInfo
 import java.net.ServerSocket
 
 /**
@@ -79,17 +83,45 @@ class AapService : Service(), UsbReceiver.Listener {
     private var isDestroying = false
     private var hasEverConnected = false
     private var accessoryHandshakeFailures = 0
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var wifiLock: WifiManager.WifiLock? = null
 
     /**
-     * Guards against duplicate [UsbAccessoryMode.connectAndSwitch] calls.
+     * Runtime-registered receiver for MEDIA_BUTTON intents.
+     * Unlike manifest-registered receivers, runtime receivers are NOT affected by
+     * Android 8+ implicit broadcast restrictions — this is a critical difference
+     * that makes steering wheel controls work on China headunits.
+     */
+    private val mediaButtonReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (Intent.ACTION_MEDIA_BUTTON == intent.action) {
+                AppLog.i("Runtime MEDIA_BUTTON receiver fired")
+                mediaSession?.let {
+                    MediaButtonReceiver.handleIntent(it, intent)
+                }
+            }
+        }
+    }
+
+    /**
+     * Guards against duplicate [UsbAccessoryMode.connectAndSwitch] calls AND duplicate
+     * [connectUsbWithRetry] calls for devices already in accessory mode.
      *
-     * Set to `true` synchronously on the main thread before launching the background
-     * connectAndSwitch coroutine. Checked in [checkAlreadyConnectedUsb] to prevent
-     * multiple concurrent AOA switch attempts on the same device.
-     * Cleared when the switch completes (success or failure), when an accessory-mode
-     * device is found, or on disconnect.
+     * Set to `true` synchronously on the main thread before launching any background
+     * USB connect/switch coroutine. Checked in [checkAlreadyConnectedUsb] to prevent
+     * multiple concurrent connection attempts on the same device.
+     * Cleared in the coroutine's finally block, or on disconnect.
      */
     private val isSwitchingToAccessory = AtomicBoolean(false)
+
+    /**
+     * Set when the phone sends VIDEO_FOCUS_NATIVE (user tapped "Exit" in AA).
+     * Suppresses [scheduleReconnectIfNeeded] so we don't try to reconnect to a
+     * stale dongle that hasn't re-enumerated yet.
+     * Cleared on USB detach (dongle reset complete) or on fresh USB attach.
+     */
+    @Volatile
+    private var userExitedAA = false
 
     private val commManager get() = App.provide(this).commManager
 
@@ -105,7 +137,10 @@ class AapService : Service(), UsbReceiver.Listener {
                 .setState(state, 0, 1.0f)
                 .setActions(android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY or
                            android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE or
-                           android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP)
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP or
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                           android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE)
                 .build()
         )
         AppLog.d("MediaSession: State updated to ${if (isPlaying) "PLAYING" else "STOPPED"}")
@@ -132,33 +167,37 @@ class AapService : Service(), UsbReceiver.Listener {
         super.onCreate()
         AppLog.i("AapService creating...")
 
-        startForeground(1, createNotification())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, createNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        } else {
+            startForeground(1, createNotification())
+        }
         setupCarMode()
         setupNightMode()
         observeConnectionState()
         registerReceivers()
 
-        // Initialize MediaSession early to be ready for early focus requests
-        mediaSession = MediaSessionCompat(this, "HeadunitRevived").apply {
-            setCallback(object : MediaSessionCompat.Callback() {})
-            setPlaybackToRemote(object : androidx.media.VolumeProviderCompat(
-                androidx.media.VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, 100, 50
-            ) {
-                override fun onAdjustVolume(direction: Int) {
-                    // Handle volume buttons from phone if needed
-                }
-            })
-            setMetadata(android.support.v4.media.MediaMetadataCompat.Builder()
-                .putString(android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE, "Android Auto")
-                .putString(android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST, "Connected")
-                .build())
-            isActive = true
+        // Initialize MediaSession early and set it active immediately.
+        // This ensures media button routing works even BEFORE an AA connection,
+        // which is critical for keymap configuration and early button presses.
+        if (mediaSession == null) {
+            setupMediaSession()
         }
+        mediaSession?.isActive = true
+        updateMediaSessionState(false) // Set initial PlaybackState so system knows our actions
+
+        LogExporter.startCapture(this, LogExporter.LogLevel.DEBUG)
+        AppLog.i("Auto-started continuous log capture")
+
+        LogExporter.startCapture(this, LogExporter.LogLevel.DEBUG)
+        AppLog.i("Auto-started continuous log capture")
 
         startService(GpsLocationService.intent(this))
         wifiDirectManager = WifiDirectManager(this)
         initWifiMode()
         checkAlreadyConnectedUsb()
+        registerNetworkMonitor()
     }
 
     /** Enables Android Automotive UI mode so the system uses car-optimised layouts. */
@@ -224,12 +263,58 @@ class AapService : Service(), UsbReceiver.Listener {
     private fun onConnected() {
         isSwitchingToAccessory.set(false)
         updateNotification()
-        mediaSession = MediaSessionCompat(this, "HeadunitRevived").apply { isActive = true }
+        acquireWifiLock()
+
+        // Reactivate the existing MediaSession (created in onCreate, kept alive across disconnects)
+        mediaSession?.isActive = true
+        updateMediaSessionState(true)
+
+        // Link audio focus state changes to our MediaSession state
+        commManager.onAudioFocusStateChanged = { isPlaying ->
+            updateMediaSessionState(isPlaying)
+        }
+
         serviceScope.launch { commManager.startHandshake() }
         startActivity(AapProjectionActivity.intent(this).apply {
             putExtra(AapProjectionActivity.EXTRA_FOCUS, true)
             addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         })
+    }
+
+    private fun setupMediaSession() {
+        mediaSession = MediaSessionCompat(this, "HeadunitRevived").apply {
+            setCallback(object : MediaSessionCompat.Callback() {
+                override fun onPlay() { commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PLAY, true); commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PLAY, false) }
+                override fun onPause() { commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PAUSE, true); commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PAUSE, false) }
+                override fun onSkipToNext() { commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_NEXT, true); commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_NEXT, false) }
+                override fun onSkipToPrevious() { commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS, true); commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS, false) }
+                override fun onStop() { commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_STOP, true); commManager.send(android.view.KeyEvent.KEYCODE_MEDIA_STOP, false) }
+
+                override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+                    val keyEvent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT, android.view.KeyEvent::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+                    }
+                    keyEvent?.let {
+                        val isPress = it.action == android.view.KeyEvent.ACTION_DOWN
+                        commManager.send(it.keyCode, isPress)
+                        return true
+                    }
+                    return super.onMediaButtonEvent(mediaButtonEvent)
+                }
+            })
+            setPlaybackToRemote(object : androidx.media.VolumeProviderCompat(
+                androidx.media.VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, 100, 50
+            ) {
+                override fun onAdjustVolume(direction: Int) {}
+            })
+            setMetadata(android.support.v4.media.MediaMetadataCompat.Builder()
+                .putString(android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE, "Android Auto")
+                .putString(android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST, "Connected")
+                .build())
+        }
     }
 
     /**
@@ -241,10 +326,14 @@ class AapService : Service(), UsbReceiver.Listener {
      */
     private fun onDisconnected(state: CommManager.ConnectionState.Disconnected) {
         isSwitchingToAccessory.set(false)
+        releaseWifiLock()
         if (!isDestroying) updateNotification()
+        // Keep MediaSession alive across disconnect/reconnect cycles.
+        // Only deactivate it — do NOT release it. A released session can no longer
+        // receive media button events, which means the keymap stops working until
+        // the next connection. HUR keeps its session alive the entire service lifetime.
         mediaSession?.isActive = false
-        mediaSession?.release()
-        mediaSession = null
+        updateMediaSessionState(false)
         serviceScope.launch(Dispatchers.IO) {
             App.provide(this@AapService).audioDecoder.stop()
             App.provide(this@AapService).videoDecoder.stop("AapService::onDisconnect")
@@ -280,9 +369,17 @@ class AapService : Service(), UsbReceiver.Listener {
         val settings = App.provide(this).settings
         val lastType = settings.lastConnectionType
 
-        // USB auto-reconnect: try again after a delay to give dongles time to re-enumerate
+        // USB auto-reconnect: try again after a delay to give dongles time to re-enumerate.
+        // Skip if the user voluntarily exited AA — the dongle is likely still connected with
+        // stale data, and reconnecting immediately just causes handshake failures. The next
+        // USB attach event will re-trigger the flow cleanly.
         if (lastType == com.andrerinas.headunitrevived.utils.Settings.CONNECTION_TYPE_USB &&
             (settings.autoConnectLastSession || settings.autoConnectSingleUsbDevice)) {
+            if (state.isUserExit) {
+                AppLog.i("AapService: USB disconnect after user Exit. Skipping auto-reconnect (waiting for dongle re-enumeration).")
+                userExitedAA = true
+                return
+            }
             AppLog.i("AapService: USB disconnect. Scheduling reconnect check in ${USB_RECONNECT_DELAY_MS}ms...")
             serviceScope.launch {
                 delay(USB_RECONNECT_DELAY_MS)
@@ -318,6 +415,45 @@ class AapService : Service(), UsbReceiver.Listener {
             UsbReceiver.createFilter(),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
+        // Runtime-registered MEDIA_BUTTON receiver.
+        // Unlike manifest-registered receivers, runtime receivers bypass the
+        // Android 8+ implicit broadcast restriction. This is the primary mechanism
+        // that makes steering wheel media buttons work on China headunits.
+        ContextCompat.registerReceiver(
+            this, mediaButtonReceiver,
+            IntentFilter(Intent.ACTION_MEDIA_BUTTON),
+            ContextCompat.RECEIVER_EXPORTED
+        )
+        AppLog.i("Registered runtime MEDIA_BUTTON receiver")
+    }
+
+    private fun registerNetworkMonitor() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                AppLog.i("NetworkMonitor: Network available: $network")
+            }
+            override fun onLost(network: Network) {
+                AppLog.w("NetworkMonitor: Network lost: $network")
+            }
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                AppLog.d("NetworkMonitor: Capabilities changed: $network → $caps")
+            }
+        }
+        networkCallback = callback
+        val request = NetworkRequest.Builder().build()
+        cm.registerNetworkCallback(request, callback)
+        AppLog.i("NetworkMonitor: Registered network change listener")
+    }
+
+    private fun unregisterNetworkMonitor() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
+        networkCallback?.let {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            try { cm.unregisterNetworkCallback(it) } catch (e: IllegalArgumentException) { AppLog.w("Network callback not registered or already unregistered", e) }
+            networkCallback = null
+        }
     }
 
     /** Starts [WirelessServer] if the user has configured server WiFi mode (mode == 2). */
@@ -328,9 +464,29 @@ class AapService : Service(), UsbReceiver.Listener {
         }
     }
 
+    private fun acquireWifiLock() {
+        if (wifiLock == null) {
+            val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "HeadunitRevived:Connection")
+        }
+        if (wifiLock?.isHeld == false) {
+            wifiLock?.acquire()
+            AppLog.i("WifiLock acquired (HIGH_PERF)")
+        }
+    }
+
+    private fun releaseWifiLock() {
+        if (wifiLock?.isHeld == true) {
+            wifiLock?.release()
+            AppLog.i("WifiLock released")
+        }
+    }
+
     override fun onDestroy() {
         AppLog.i("AapService destroying...")
         isDestroying = true
+        releaseWifiLock()
+        unregisterNetworkMonitor()
         stopForeground(true)
         stopWirelessServer()
         wifiDirectManager?.stop()
@@ -341,8 +497,10 @@ class AapService : Service(), UsbReceiver.Listener {
         nightModeManager?.stop()
         unregisterReceiver(nightModeUpdateReceiver)
         unregisterReceiver(usbReceiver)
+        try { unregisterReceiver(mediaButtonReceiver) } catch (_: Exception) {}
         uiModeManager.disableCarMode(0)
         serviceScope.cancel()
+        LogExporter.stopCapture()
         super.onDestroy()
     }
 
@@ -357,7 +515,19 @@ class AapService : Service(), UsbReceiver.Listener {
             return START_NOT_STICKY
         }
 
-        startForeground(1, createNotification())
+        // Route MEDIA_BUTTON intents to the active MediaSession.
+        // This is the AndroidX-recommended pattern: MediaButtonReceiver (manifest)
+        // forwards the intent to this service, and handleIntent() dispatches it
+        // to the MediaSession callback. This works on Android 8+ where implicit
+        // broadcasts to manifest-registered receivers are restricted.
+        mediaSession?.let { MediaButtonReceiver.handleIntent(it, intent) }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, createNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        } else {
+            startForeground(1, createNotification())
+        }
         when (intent?.action) {
             ACTION_START_SELF_MODE       -> startSelfMode()
             ACTION_START_WIRELESS        -> startWirelessServer()
@@ -389,6 +559,7 @@ class AapService : Service(), UsbReceiver.Listener {
     // -------------------------------------------------------------------------
 
     override fun onUsbAttach(device: UsbDevice) {
+        userExitedAA = false
         if (UsbDeviceCompat.isInAccessoryMode(device)) {
             // Device already in AOA mode (re-enumerated after UsbAttachedActivity switched it).
             AppLog.i("USB accessory device attached, connecting.")
@@ -411,6 +582,7 @@ class AapService : Service(), UsbReceiver.Listener {
     }
 
     override fun onUsbDetach(device: UsbDevice) {
+        userExitedAA = false
         if (commManager.isConnectedToUsbDevice(device)) {
             // Cable physically removed — the USB connection is already dead, so skip the
             // ByeByeRequest send (which would block ~1 s trying to write to a gone device).
@@ -423,8 +595,14 @@ class AapService : Service(), UsbReceiver.Listener {
         if (granted) {
             AppLog.i("USB permission granted for $deviceName")
             if (UsbDeviceCompat.isInAccessoryMode(device)) {
-                isSwitchingToAccessory.set(false)
-                serviceScope.launch { connectUsbWithRetry(device) }
+                isSwitchingToAccessory.set(true)
+                serviceScope.launch {
+                    try {
+                        connectUsbWithRetry(device)
+                    } finally {
+                        isSwitchingToAccessory.set(false)
+                    }
+                }
             } else {
                 isSwitchingToAccessory.set(true)
                 val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
@@ -525,8 +703,14 @@ class AapService : Service(), UsbReceiver.Listener {
         for (device in deviceList.values) {
             if (UsbDeviceCompat.isInAccessoryMode(device)) {
                 AppLog.i("Found device already in accessory mode: ${UsbDeviceCompat(device).uniqueName}")
-                isSwitchingToAccessory.set(false)
-                serviceScope.launch { connectUsbWithRetry(device) }
+                isSwitchingToAccessory.set(true)
+                serviceScope.launch {
+                    try {
+                        connectUsbWithRetry(device)
+                    } finally {
+                        isSwitchingToAccessory.set(false)
+                    }
+                }
                 return
             }
         }
@@ -561,11 +745,24 @@ class AapService : Service(), UsbReceiver.Listener {
             }
         }
 
-        // Single-USB mode: if exactly one non-accessory device is present, connect to it
+        // Single-USB mode: connect if there's exactly one candidate device.
+        // If the user has marked specific devices as "Allowed" in the USB list,
+        // only count those — so non-AA peripherals (dashcams, USB audio, etc.)
+        // don't prevent auto-connect. Falls back to counting all devices when
+        // no devices have been explicitly allowed (fresh install).
         if (singleUsb) {
             val nonAccessoryDevices = deviceList.values.filter { !UsbDeviceCompat.isInAccessoryMode(it) }
-            if (nonAccessoryDevices.size == 1) {
-                performSingleUsbConnect(nonAccessoryDevices[0])
+            val allowed = settings.allowedDevices
+            val candidates = if (allowed.isNotEmpty()) {
+                nonAccessoryDevices.filter { allowed.contains(UsbDeviceCompat(it).uniqueName) }
+            } else {
+                nonAccessoryDevices
+            }
+            if (allowed.isNotEmpty() && candidates.size != nonAccessoryDevices.size) {
+                AppLog.i("Single USB auto-connect: ${nonAccessoryDevices.size} USB device(s) present, ${candidates.size} allowed")
+            }
+            if (candidates.size == 1) {
+                performSingleUsbConnect(candidates[0])
             }
         }
     }
@@ -852,8 +1049,12 @@ class AapService : Service(), UsbReceiver.Listener {
         private var job: Job? = null
 
         fun start() {
-            nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
-            registerNsd()
+            nsdManager = getSystemService(Context.NSD_SERVICE) as? NsdManager
+            if (nsdManager == null) {
+                AppLog.e("WirelessServer: NsdManager not available on this device.")
+            } else {
+                registerNsd()
+            }
 
             job = serviceScope.launch(Dispatchers.IO) {
                 try {

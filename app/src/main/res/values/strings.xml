@@ -189,10 +189,11 @@
     <string name="mic_input_source">Microphone Input Source</string>
     <string name="mic_input_source_description">Choose the audio source for the microphone.</string>
     <string-array name="mic_input_sources">
-        <item>Default</item>
-        <item>Microphone</item>
-        <item>Voice Recognition</item>
-        <item>Voice Communication</item>
+        <item>Default (System decides)</item>
+        <item>Built-in Microphone (Raw input)</item>
+        <item>Voice Recognition (Noise reduced)</item>
+        <item>Voice Communication (Echo + noise cancelled)</item>
+        <item>Bluetooth Headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -252,6 +253,9 @@
     <string name="failed">Failed</string>
     <string name="failed_start_android_auto">Failed to start Android Auto</string>
     <string name="android_auto_starting">Android Auto is starting…</string>
+    <string name="connection_interrupted">Connection lost</string>
+    <string name="connection_interrupted_detail">Retrying…</string>
+    <string name="wifi_disconnect_toast">If using wireless AA, disable \"Switch between networks\" or \"Network acceleration\" in phone WiFi settings</string>
     <string name="reset_usb_option">Reset USB Connection</string>
     <string name="reset_usb_timeout">USB device not found. Please check connection.</string>
     <string name="notification_service_running">Headunit Revived is running</string>
@@ -260,6 +264,8 @@
     <string name="shortcut_connect_desc">Connect to last known device</string>
     <string name="shortcut_disconnect_title">Disconnect</string>
     <string name="shortcut_disconnect_desc">End current session</string>
+    <string name="shortcut_exit_title">Exit App</string>
+    <string name="shortcut_exit_desc">Stop all services and close the app</string>
     <string name="shortcut_night_mode_auto_title">Mode: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Restore automatic night mode</string>
     <string name="shortcut_night_mode_day_title">Mode: Day</string>
@@ -282,5 +288,30 @@
     <string name="setup_widescreen_detected">Widescreen display detected.</string>
     <string name="auto_optimize">Auto-Optimize Settings</string>
     <string name="auto_optimize_desc">Run the system check to find the best settings for your device.</string>
+
+    <!-- Navigation notifications (from any AA nav app) -->
+    <string name="show_navigation_notifications">Navigation notifications</string>
+    <string name="show_navigation_notifications_description">Show \"In X meters do Y\" and current street in notifications (for debugging)</string>
+    <string name="nav_notification_channel_name">Navigation</string>
+    <string name="nav_notification_channel_description">Turn-by-turn navigation updates from Android Auto</string>
+    <string name="nav_notification_title_format">In %1$d m — %2$s</string>
+    <string name="nav_notification_street_format">Street: %1$s</string>
+    <string name="nav_action_unknown">Action</string>
+    <string name="nav_action_depart">Depart</string>
+    <string name="nav_action_name_change">Name change</string>
+    <string name="nav_action_slight_turn">Slight turn</string>
+    <string name="nav_action_turn">Turn</string>
+    <string name="nav_action_sharp_turn">Sharp turn</string>
+    <string name="nav_action_uturn">U-turn</string>
+    <string name="nav_action_on_ramp">Enter road</string>
+    <string name="nav_action_off_ramp">Exit ramp</string>
+    <string name="nav_action_merge">Merge</string>
+    <string name="nav_action_roundabout_enter">Enter roundabout</string>
+    <string name="nav_action_roundabout_exit">Exit roundabout</string>
+    <string name="nav_action_roundabout">Roundabout</string>
+    <string name="nav_action_straight">Straight</string>
+    <string name="nav_action_ferry">Ferry</string>
+    <string name="nav_action_ferry_train">Ferry / train</string>
+    <string name="nav_action_destination">Arrival</string>
 </resources>
 

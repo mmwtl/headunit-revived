@@ -8,6 +8,7 @@ import android.view.Surface
 import com.andrerinas.headunitrevived.utils.AppLog
 import com.andrerinas.headunitrevived.utils.Settings
 import com.andrerinas.headunitrevived.utils.HeadUnitScreenConfig
+import android.os.SystemClock
 import java.nio.ByteBuffer
 import java.util.Locale
 import kotlin.math.pow
@@ -49,6 +50,8 @@ class VideoDecoder(private val settings: Settings) {
     // @Volatile so the output thread sees the value written by the caller (typically the main
     // thread). Fired on the first releaseOutputBuffer — i.e. when the frame is actually rendered.
     @Volatile var onFirstFrameListener: (() -> Unit)? = null
+    // Timestamp of the last rendered frame (elapsedRealtime). 0 means no frame has been rendered yet.
+    @Volatile var lastFrameRenderedMs: Long = 0L
 
     val videoWidth: Int get() = mWidth
     val videoHeight: Int get() = mHeight
@@ -106,6 +109,7 @@ class VideoDecoder(private val settings: Settings) {
             codecBufferInfo = null
             codecConfigured = false
             onFirstFrameListener = null
+            lastFrameRenderedMs = 0L
             AppLog.i("Decoder stopped: $reason")
         }
     }
@@ -410,6 +414,7 @@ class VideoDecoder(private val settings: Settings) {
                 val outputIndex = currentCodec.dequeueOutputBuffer(bufferInfo, 10000L)
                 if (outputIndex >= 0) {
                     currentCodec.releaseOutputBuffer(outputIndex, true)
+                    lastFrameRenderedMs = SystemClock.elapsedRealtime()
                     onFirstFrameListener?.let { it(); onFirstFrameListener = null }
                 } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     handleOutputFormatChange(currentCodec.outputFormat)

@@ -184,6 +184,7 @@
         <item>Mikrofon</item>
         <item>Rozpoznawanie głosu</item>
         <item>Komunikacja głosowa</item>
+        <item>Zestaw słuchawki Bluetooth (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -243,6 +244,9 @@
     <string name="failed">Niepowodzenie</string>
     <string name="failed_start_android_auto">Uruchomienie Android Auto nie powiodło się</string>
     <string name="android_auto_starting">Android Auto uruchamia się…</string>
+    <string name="connection_interrupted">Utracono połączenie</string>
+    <string name="connection_interrupted_detail">Ponawianie próby…</string>
+    <string name="wifi_disconnect_toast">Jeśli używasz bezprzewodowego AA, wyłącz \"Przełączanie między sieciami\" lub \"Przyspieszenie sieci\" w ustawieniach WiFi telefonu</string>
     <string name="reset_usb_option">Zresetuj połączenie USB</string>
     <string name="reset_usb_timeout">Nie znaleziono urządzenia USB. Sprawdź połączenie.</string>
     <string name="notification_service_running">Headunit Revived działa</string>
@@ -250,7 +254,9 @@
     <string name="shortcut_connect_title">Połącz</string>
     <string name="shortcut_connect_desc">Połącz z ostatnim urządzeniem</string>
     <string name="shortcut_disconnect_title">Rozłącz</string>
-    <string name="shortcut_disconnect_desc">Zakończ obecną sesję</string>
+    <string name="shortcut_disconnect_desc">Zakończ bieżącą sesję</string>
+    <string name="shortcut_exit_title">Zamknij aplikację</string>
+    <string name="shortcut_exit_desc">Zatrzymaj wszystkie usługi i zamknij aplikację</string>
     <string name="shortcut_night_mode_auto_title">Tryb: Auto</string>
     <string name="shortcut_night_mode_auto_desc">Przywróć automatyczny tryb nocny</string>
     <string name="shortcut_night_mode_day_title">Tryb: Dzień</string>
@@ -282,4 +288,29 @@
     <string name="start_log_capture_description">Begins recording system logs to a file.</string>
     <string name="stop_log_capture">Stop log capture</string>
     <string name="stop_log_capture_description">Stops recording and saves the log file.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">Powiadomienia nawigacji</string>
+    <string name="show_navigation_notifications_description">Pokaż „Za X metrów Y" i aktualną ulicę w powiadomieniach (do debugowania)</string>
+    <string name="nav_notification_channel_name">Nawigacja</string>
+    <string name="nav_notification_channel_description">Wskazówki nawigacyjne z Android Auto</string>
+    <string name="nav_notification_title_format">Za %1$d m — %2$s</string>
+    <string name="nav_notification_street_format">Ulica: %1$s</string>
+    <string name="nav_action_unknown">Akcja</string>
+    <string name="nav_action_depart">Wyruszaj</string>
+    <string name="nav_action_name_change">Zmiana nazwy</string>
+    <string name="nav_action_slight_turn">Łagodny skręt</string>
+    <string name="nav_action_turn">Skręt</string>
+    <string name="nav_action_sharp_turn">Ostry skręt</string>
+    <string name="nav_action_uturn">Zawracanie</string>
+    <string name="nav_action_on_ramp">Wjazd</string>
+    <string name="nav_action_off_ramp">Zjazd</string>
+    <string name="nav_action_merge">Włączenie się</string>
+    <string name="nav_action_roundabout_enter">Wjazd na rondo</string>
+    <string name="nav_action_roundabout_exit">Zjazd z ronda</string>
+    <string name="nav_action_roundabout">Rondo</string>
+    <string name="nav_action_straight">Prosto</string>
+    <string name="nav_action_ferry">Prom</string>
+    <string name="nav_action_ferry_train">Prom / pociąg</string>
+    <string name="nav_action_destination">Przyjazd</string>
     </resources>

@@ -153,13 +153,30 @@
 
         <service
             android:name=".aap.AapService"
-            android:foregroundServiceType="connectedDevice|mediaPlayback" />
+            android:foregroundServiceType="connectedDevice|mediaPlayback"
+            android:exported="false">
+            <!-- MediaButtonReceiver looks for a Service with this intent-filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </service>
         <service android:name=".location.GpsLocationService" />
 
+        <!-- AndroidX MediaButtonReceiver: Routes MEDIA_BUTTON intents to AapService
+             on Android 8+ where implicit broadcasts to manifest-registered receivers
+             are restricted. This is the standard Android mechanism used by HUR. -->
+        <receiver android:name="androidx.media.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Handles proprietary headunit command intents (com.android.music.*,
+             com.syu.*, etc). MEDIA_BUTTON is handled by MediaButtonReceiver above. -->
         <receiver android:name=".app.RemoteControlReceiver"
             android:exported="true">
             <intent-filter android:priority="1000">
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="com.android.music.musicservicecommand" />
                 <action android:name="com.android.music.playstatechanged" />
                 <action android:name="com.android.music.metachanged" />

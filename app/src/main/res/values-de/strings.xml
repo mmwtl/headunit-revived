@@ -187,6 +187,7 @@
         <item>Mikrofon</item>
         <item>Spracherkennung</item>
         <item>Sprachkommunikation</item>
+        <item>Bluetooth-Headset (SCO)</item>
     </string-array>
 
     <!-- Info Settings -->
@@ -246,12 +247,17 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="failed_start_android_auto">Start von Android Auto fehlgeschlagen</string>
     <string name="android_auto_starting">Android Auto startet…</string>
+    <string name="connection_interrupted">Verbindung verloren</string>
+    <string name="connection_interrupted_detail">Erneuter Versuch…</string>
+    <string name="wifi_disconnect_toast">Bei kabellosem AA \"Zwischen Netzwerken wechseln\" oder \"Netzwerkbeschleunigung\" in den WLAN-Einstellungen deaktivieren</string>
     <string name="notification_service_running">Headunit Revived läuft</string>
     <string name="notification_projection_active">Android Auto wird projiziert</string>
     <string name="shortcut_connect_title">Verbinden</string>
     <string name="shortcut_connect_desc">Mit letztem Gerät verbinden</string>
     <string name="shortcut_disconnect_title">Trennen</string>
     <string name="shortcut_disconnect_desc">Aktuelle Sitzung beenden</string>
+    <string name="shortcut_exit_title">App beenden</string>
+    <string name="shortcut_exit_desc">Alle Dienste stoppen und App schließen</string>
     <string name="reset_usb_option">USB-Verbindung zurücksetzen</string>
     <string name="reset_usb_timeout">USB-Gerät nicht gefunden. Bitte Verbindung prüfen.</string>
     <string name="shortcut_night_mode_auto_title">Modus: Auto</string>
@@ -282,4 +288,29 @@
     <string name="start_log_capture_description">Startet das Mitschreiben von System-Logs in eine Datei.</string>
     <string name="stop_log_capture">Log-Aufzeichnung stoppen</string>
     <string name="stop_log_capture_description">Stoppt die Aufzeichnung und speichert die Log-Datei.</string>
+
+    <!-- Navigation notifications -->
+    <string name="show_navigation_notifications">Navigationsbenachrichtigungen</string>
+    <string name="show_navigation_notifications_description">„In X Metern Y" und aktuelle Straße in Benachrichtigungen anzeigen (zum Debuggen)</string>
+    <string name="nav_notification_channel_name">Navigation</string>
+    <string name="nav_notification_channel_description">Abbiegehinweise von Android Auto</string>
+    <string name="nav_notification_title_format">In %1$d m — %2$s</string>
+    <string name="nav_notification_street_format">Straße: %1$s</string>
+    <string name="nav_action_unknown">Aktion</string>
+    <string name="nav_action_depart">Losfahren</string>
+    <string name="nav_action_name_change">Straßenwechsel</string>
+    <string name="nav_action_slight_turn">Leicht abbiegen</string>
+    <string name="nav_action_turn">Abbiegen</string>
+    <string name="nav_action_sharp_turn">Scharf abbiegen</string>
+    <string name="nav_action_uturn">Wenden</string>
+    <string name="nav_action_on_ramp">Auffahrt</string>
+    <string name="nav_action_off_ramp">Abfahrt</string>
+    <string name="nav_action_merge">Einfädeln</string>
+    <string name="nav_action_roundabout_enter">In Kreisverkehr einfahren</string>
+    <string name="nav_action_roundabout_exit">Kreisverkehr verlassen</string>
+    <string name="nav_action_roundabout">Kreisverkehr</string>
+    <string name="nav_action_straight">Geradeaus</string>
+    <string name="nav_action_ferry">Fähre</string>
+    <string name="nav_action_ferry_train">Fähre / Zug</string>
+    <string name="nav_action_destination">Ankunft</string>
 </resources>

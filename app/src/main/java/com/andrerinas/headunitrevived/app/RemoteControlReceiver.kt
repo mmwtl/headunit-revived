@@ -63,15 +63,15 @@ class RemoteControlReceiver : BroadcastReceiver() {
             }
 
             when (command) {
-                "next", "skip_next" -> {
+                "next", "skip_next", "skip", "forward", "skip_forward" -> {
                     commManager.send(KeyEvent.KEYCODE_MEDIA_NEXT, true)
                     commManager.send(KeyEvent.KEYCODE_MEDIA_NEXT, false)
                 }
-                "previous", "skip_previous", "prev" -> {
+                "previous", "skip_previous", "prev", "rewind", "back", "skip_back", "skip_backward" -> {
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PREVIOUS, true)
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PREVIOUS, false)
                 }
-                "play", "start" -> {
+                "play", "start", "resume" -> {
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PLAY, true)
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PLAY, false)
                 }
@@ -79,9 +79,30 @@ class RemoteControlReceiver : BroadcastReceiver() {
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PAUSE, true)
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PAUSE, false)
                 }
-                "togglepause", "playpause" -> {
+                "togglepause", "playpause", "play_pause", "media_play_pause" -> {
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, true)
                     commManager.send(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, false)
+                }
+                "mute", "volume_mute" -> {
+                    commManager.send(KeyEvent.KEYCODE_VOLUME_MUTE, true)
+                    commManager.send(KeyEvent.KEYCODE_VOLUME_MUTE, false)
+                }
+                "voice", "mic", "microphone", "search" -> {
+                    commManager.send(KeyEvent.KEYCODE_SEARCH, true)
+                    commManager.send(KeyEvent.KEYCODE_SEARCH, false)
+                }
+                else -> {
+                    // Some headunits send a raw keycode as an int extra
+                    val extraKeyCode = intent.getIntExtra("keycode", -1)
+                        .takeIf { it > 0 }
+                        ?: intent.getIntExtra("key_code", -1).takeIf { it > 0 }
+                    if (extraKeyCode != null) {
+                        AppLog.i("RemoteControlReceiver: raw keycode=$extraKeyCode from command=$command")
+                        commManager.send(extraKeyCode, true)
+                        commManager.send(extraKeyCode, false)
+                    } else {
+                        AppLog.i("RemoteControlReceiver: Unknown command='$command' from action='$action'")
+                    }
                 }
             }
         }
