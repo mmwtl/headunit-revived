@@ -99,7 +99,6 @@ class SettingsFragment : Fragment(), SensorEventListener {
     private var pendingInsetRight: Int? = null
     private var pendingInsetBottom: Int? = null
 
-    private var pendingAutoStartOnUsb: Boolean? = null
     private var pendingAppTheme: Settings.AppTheme? = null
     private var pendingAppThemeThresholdLux: Int? = null
     private var pendingAppThemeThresholdBrightness: Int? = null
