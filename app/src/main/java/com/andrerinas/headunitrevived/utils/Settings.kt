@@ -387,6 +387,12 @@ class Settings(context: Context) {
             prefs.edit().putInt("night-mode-manual-end", value).apply()
         }
 
+    var showFpsCounter: Boolean
+        get() = prefs.getBoolean("show-fps-counter", false)
+        set(value) {
+            prefs.edit().putBoolean("show-fps-counter", value).apply()
+        }
+
     companion object {
         const val CONNECTION_TYPE_WIFI = "wifi"
         const val CONNECTION_TYPE_USB = "usb"

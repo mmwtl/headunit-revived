@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Пором</string>
     <string name="nav_action_ferry_train">Пором / потяг</string>
     <string name="nav_action_destination">Прибуття</string>
+    <string name="show_fps_counter">Показувати лічильник FPS</string>
+    <string name="show_fps_counter_description">Відображати частоту кадрів у реальному часі у верхньому лівому куті під час проекції.</string>
     </resources>

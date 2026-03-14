@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Trajekt</string>
     <string name="nav_action_ferry_train">Trajekt / vlak</string>
     <string name="nav_action_destination">Příjezd</string>
+    <string name="show_fps_counter">Zobrazit počítadlo FPS</string>
+    <string name="show_fps_counter_description">Během projekce zobrazí v levém horním rohu aktuální FPS.</string>
 </resources>

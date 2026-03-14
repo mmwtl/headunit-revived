@@ -312,5 +312,7 @@
     <string name="nav_action_straight">مباشرة</string>
     <string name="nav_action_ferry">عبّارة</string>
     <string name="nav_action_ferry_train">عبّارة / قطار</string>
-    <string name="nav_action_destination">وصول</string>
+    <string name="nav_action_destination">الوصول</string>
+    <string name="show_fps_counter">إظهار عداد FPS</string>
+    <string name="show_fps_counter_description">إظهار معدل الإطارات في الوقت الفعلي في الزاوية العلوية اليسرى أثناء العرض.</string>
 </resources>

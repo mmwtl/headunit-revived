@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Prom</string>
     <string name="nav_action_ferry_train">Prom / pociąg</string>
     <string name="nav_action_destination">Przyjazd</string>
+    <string name="show_fps_counter">Pokaż licznik FPS</string>
+    <string name="show_fps_counter_description">Wyświetla licznik FPS w czasie rzeczywistym w lewym górnym rogu podczas projekcji.</string>
     </resources>

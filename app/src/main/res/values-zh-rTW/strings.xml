@@ -312,4 +312,6 @@
     <string name="nav_action_ferry">渡輪</string>
     <string name="nav_action_ferry_train">渡輪／火車</string>
     <string name="nav_action_destination">抵達</string>
+    <string name="show_fps_counter">顯示 FPS 計數器</string>
+    <string name="show_fps_counter_description">在投影期間於左上角顯示即時 FPS 資訊。</string>
 </resources>

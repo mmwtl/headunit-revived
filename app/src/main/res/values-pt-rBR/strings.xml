@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Balsa</string>
     <string name="nav_action_ferry_train">Balsa / trem</string>
     <string name="nav_action_destination">Chegada</string>
+    <string name="show_fps_counter">Mostrar contador de FPS</string>
+    <string name="show_fps_counter_description">Exibe a contagem de FPS em tempo real no canto superior esquerdo durante a projeção.</string>
 </resources>

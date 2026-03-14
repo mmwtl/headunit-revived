@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Fähre</string>
     <string name="nav_action_ferry_train">Fähre / Zug</string>
     <string name="nav_action_destination">Ankunft</string>
+    <string name="show_fps_counter">FPS-Zähler anzeigen</string>
+    <string name="show_fps_counter_description">Echtzeit-FPS oben links während der Projektion einblenden.</string>
 </resources>

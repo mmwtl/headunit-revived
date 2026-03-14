@@ -312,4 +312,6 @@
     <string name="nav_action_ferry">Komp</string>
     <string name="nav_action_ferry_train">Komp / vonat</string>
     <string name="nav_action_destination">Megérkezés</string>
+    <string name="show_fps_counter">FPS számláló megjelenítése</string>
+    <string name="show_fps_counter_description">Valós idejű FPS számláló megjelenítése a bal felső sarokban a kivetítés alatt.</string>
 </resources>

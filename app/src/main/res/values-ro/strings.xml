@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Feribot</string>
     <string name="nav_action_ferry_train">Feribot / tren</string>
     <string name="nav_action_destination">Sosire</string>
+    <string name="show_fps_counter">Afișează contor FPS</string>
+    <string name="show_fps_counter_description">Afișează FPS în timp real în colțul din stânga sus în timpul proiecției.</string>
 </resources>

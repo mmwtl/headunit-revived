@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Ferry</string>
     <string name="nav_action_ferry_train">Ferry / tren</string>
     <string name="nav_action_destination">Llegada</string>
+    <string name="show_fps_counter">Mostrar contador de FPS</string>
+    <string name="show_fps_counter_description">Muestra una superposición de FPS en tiempo real en la esquina superior izquierda durante la proyección.</string>
 </resources>

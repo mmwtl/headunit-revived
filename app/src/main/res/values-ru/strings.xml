@@ -313,4 +313,6 @@
     <string name="nav_action_ferry">Паром</string>
     <string name="nav_action_ferry_train">Паром / поезд</string>
     <string name="nav_action_destination">Прибытие</string>
+    <string name="show_fps_counter">Показывать счетчик FPS</string>
+    <string name="show_fps_counter_description">Отображать текущую частоту кадров в верхнем левом углу во время проекции.</string>
 </resources>
