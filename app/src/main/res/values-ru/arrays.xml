@@ -2,10 +2,21 @@
 <resources>
     <string-array name="night_mode">
         <item>Авто (Восход/Закат)</item>
-        <item>День</item>
-        <item>Ночь</item>
+        <item>Светлая</item>
+        <item>Тёмная</item>
         <item>Ручное время</item>
         <item>Датчик света</item>
+        <item>Яркость экрана</item>
+    </string-array>
+
+    <string-array name="app_theme">
+        <item>Автоматически (Система)</item>
+        <item>Светлая</item>
+        <item>Тёмная</item>
+        <item>Сверхтёмная</item>
+        <item>Авто (Восход/Закат)</item>
+        <item>Ручное время</item>
+        <item>Датчик освещённости</item>
         <item>Яркость экрана</item>
     </string-array>
 </resources>

@@ -18,13 +18,25 @@
     <string name="dpi">Pixel dichtheid (DPI)</string>
     <string name="mic_sample_rate">Samplefrequentie van de microfoon</string>
     <string name="keymap">Keymap</string>
-    <string name="night_mode">Nacht modes</string>
+    <string name="night_mode">Donkere modus (Android Auto)</string>
     <string name="night_mode_threshold">Drempelwaarde nachtmodus</string>
     <string name="enter_threshold_value">Voer drempelwaarde in</string>
     <string name="threshold_lux_desc">Lux waarde (0-10000). Hieronder = Nacht.</string>
     <string name="threshold_brightness_desc">Helderheidswaarde (0-255). Hieronder = Nacht.</string>
+    <string name="threshold_light_title">Lichtgevoeligheid</string>
+    <string name="threshold_brightness_title">Helderheidsniveau</string>
+    <string name="threshold_light_hint">Donkere modus wordt geactiveerd wanneer het omgevingslicht onder dit niveau daalt</string>
+    <string name="threshold_brightness_hint">Donkere modus wordt geactiveerd wanneer de schermhelderheid onder deze waarde is. Android rapporteert helderheid als 0–255, maar het werkelijke bereik kan per apparaat verschillen. Mogelijk moet u experimenteren om de juiste drempel voor uw apparaat te vinden.</string>
+    <string name="current_light_reading">Huidig licht: %d Lux</string>
+    <string name="enable_fine_lux_control">Fijnafstemming (0–100 Lux)</string>
     <string name="night_mode_start">Starttijd nachtmodus</string>
     <string name="night_mode_end">Eindtijd nachtmodus</string>
+
+    <string name="app_theme">Donkere modus (Applicatie)</string>
+    <string name="app_theme_description">Bepaal het uiterlijk van de app</string>
+    <string name="change_app_theme">Thema wijzigen</string>
+    <string name="category_dark_mode">Donkere modus</string>
+    <string name="category_navigation">Navigatie</string>
 
     <string name="reconnection_required_title">Opnieuw verbinden vereist</string>
     <string name="reconnection_required_message">Het apparaat staat in de wachtstand. Koppel de USB-kabel los en sluit deze opnieuw aan om Android Auto opnieuw te starten.</string>
@@ -312,6 +324,10 @@
     <string name="nav_action_ferry">Veerboot</string>
     <string name="nav_action_ferry_train">Veerboot / trein</string>
     <string name="nav_action_destination">Aankomst</string>
+    <string name="monochrome_icons">Monochrome pictogrammen</string>
+    <string name="monochrome_icons_description">Grijstinten pictogrammen op het startscherm gebruiken in Donker of Extra donker modus</string>
+    <string name="use_extreme_dark">Extra donker gebruiken</string>
+    <string name="use_extreme_dark_description">Puur zwarte achtergrond gebruiken wanneer donkere modus actief is</string>
     <string name="show_fps_counter">FPS-teller weergeven</string>
     <string name="show_fps_counter_description">Toon een real-time FPS-overlay in de linkerbovenhoek tijdens projectie.</string>
     </resources>

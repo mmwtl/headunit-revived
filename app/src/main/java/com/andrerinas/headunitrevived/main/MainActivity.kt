@@ -19,6 +19,7 @@ import com.andrerinas.headunitrevived.aap.AapService
 import com.andrerinas.headunitrevived.app.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.andrerinas.headunitrevived.utils.AppLog
+import android.content.res.Configuration
 import com.andrerinas.headunitrevived.utils.Settings
 import com.andrerinas.headunitrevived.utils.SetupWizard
 import com.andrerinas.headunitrevived.utils.SystemUI
@@ -61,6 +62,12 @@ class MainActivity : BaseActivity() {
         }
 
         setTheme(R.style.AppTheme)
+        val mainSettings = Settings(this)
+        val isNightActive = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        if (mainSettings.appTheme == Settings.AppTheme.EXTREME_DARK ||
+            (mainSettings.useExtremeDarkMode && isNightActive)) {
+            theme.applyStyle(R.style.ThemeOverlay_ExtremeDark, true)
+        }
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 

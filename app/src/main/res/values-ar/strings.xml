@@ -19,13 +19,25 @@
     <string name="dpi">كثافة البكسل (DPI)</string>
     <string name="mic_sample_rate">معدل أخذ عينات الميكروفون</string>
     <string name="keymap">مفاتيح التحكم</string>
-    <string name="night_mode">الوضع الليلي</string>
+    <string name="night_mode">الوضع الداكن (Android Auto)</string>
     <string name="night_mode_threshold">عتبة الوضع الليلي</string>
     <string name="enter_threshold_value">أدخل قيمة العتبة</string>
     <string name="threshold_lux_desc">قيمة Lux (0–10000). ما دونها = ليلي.</string>
     <string name="threshold_brightness_desc">قيمة السطوع (0–255). ما دونها = ليلي.</string>
+    <string name="threshold_light_title">حساسية الضوء</string>
+    <string name="threshold_brightness_title">مستوى السطوع</string>
+    <string name="threshold_light_hint">يتم تفعيل الوضع الداكن عندما ينخفض الضوء المحيط عن هذا المستوى</string>
+    <string name="threshold_brightness_hint">يتم تفعيل الوضع الداكن عندما يكون سطوع الشاشة أقل من هذه القيمة. يُبلغ أندرويد عن السطوع بنطاق 0–255، لكن النطاق الفعلي قد يختلف حسب الجهاز. قد تحتاج إلى التجربة للعثور على الحد المناسب لجهازك.</string>
+    <string name="current_light_reading">الضوء الحالي: %d لوكس</string>
+    <string name="enable_fine_lux_control">تحكم دقيق (0–100 لوكس)</string>
     <string name="night_mode_start">وقت بدء الوضع الليلي</string>
     <string name="night_mode_end">وقت انتهاء الوضع الليلي</string>
+
+    <string name="app_theme">الوضع الداكن (التطبيق)</string>
+    <string name="app_theme_description">التحكم في المظهر المرئي للتطبيق</string>
+    <string name="change_app_theme">تغيير سمة التطبيق</string>
+    <string name="category_dark_mode">الوضع الداكن</string>
+    <string name="category_navigation">الملاحة</string>
 
     <string name="reconnection_required_title">يلزم إعادة الاتصال</string>
     <string name="reconnection_required_message">الجهاز في حالة انتظار. يرجى فصل كابل USB وإعادة توصيله لبدء Android Auto مجددا.</string>
@@ -312,7 +324,11 @@
     <string name="nav_action_straight">مباشرة</string>
     <string name="nav_action_ferry">عبّارة</string>
     <string name="nav_action_ferry_train">عبّارة / قطار</string>
-    <string name="nav_action_destination">الوصول</string>
+    <string name="nav_action_destination">وصول</string>
+    <string name="monochrome_icons">أيقونات أحادية اللون</string>
+    <string name="monochrome_icons_description">استخدام أيقونات رمادية على الشاشة الرئيسية في الوضع الداكن أو الداكن المطلق</string>
+    <string name="use_extreme_dark">استخدام الوضع الداكن المطلق</string>
+    <string name="use_extreme_dark_description">استخدام خلفية سوداء بالكامل عند تفعيل الوضع الداكن</string>
     <string name="show_fps_counter">إظهار عداد FPS</string>
     <string name="show_fps_counter_description">إظهار معدل الإطارات في الوقت الفعلي في الزاوية العلوية اليسرى أثناء العرض.</string>
 </resources>

@@ -19,13 +19,25 @@
     <string name="dpi">Pixel sűrűség (DPI)</string>
     <string name="mic_sample_rate">Mikrofon mintavételi frekvencia</string>
     <string name="keymap">Gombkiosztás</string>
-    <string name="night_mode">Éjszakai mód</string>
+    <string name="night_mode">Sötét mód (Android Auto)</string>
     <string name="night_mode_threshold">Éjszakai mód küszöb</string>
     <string name="enter_threshold_value">Add meg a küszöb értéket</string>
     <string name="threshold_lux_desc">Lux érték (0–10000). Ez alatt = Éjszaka.</string>
     <string name="threshold_brightness_desc">Fényerő érték (0–255). Ez alatt = Éjszaka.</string>
+    <string name="threshold_light_title">Fényérzékenység</string>
+    <string name="threshold_brightness_title">Fényerő szint</string>
+    <string name="threshold_light_hint">A sötét mód aktiválódik, ha a környezeti fény ez alá a szint alá csökken</string>
+    <string name="threshold_brightness_hint">A sötét mód aktiválódik, ha a képernyő fényereje ez alatt az érték alatt van. Az Android 0–255 közötti értékként jelenti a fényerőt, de a tényleges tartomány eszközönként eltérhet. Előfordulhat, hogy kísérletezni kell a megfelelő küszöbérték megtalálásához.</string>
+    <string name="current_light_reading">Jelenlegi fény: %d Lux</string>
+    <string name="enable_fine_lux_control">Finom szabályozás (0–100 Lux)</string>
     <string name="night_mode_start">Éjszakai mód kezdete</string>
     <string name="night_mode_end">Éjszakai mód vége</string>
+
+    <string name="app_theme">Sötét mód (Alkalmazás)</string>
+    <string name="app_theme_description">Az alkalmazás megjelenésének vezérlése</string>
+    <string name="change_app_theme">Téma módosítása</string>
+    <string name="category_dark_mode">Sötét mód</string>
+    <string name="category_navigation">Navigáció</string>
 
     <string name="reconnection_required_title">Újrakapcsolódás szükséges</string>
     <string name="reconnection_required_message">Az eszköz várakozó állapotban van. Kérlek húzd ki, majd dugd vissza az USB-kábelt az Android Auto újraindításához.</string>
@@ -312,6 +324,10 @@
     <string name="nav_action_ferry">Komp</string>
     <string name="nav_action_ferry_train">Komp / vonat</string>
     <string name="nav_action_destination">Megérkezés</string>
+    <string name="monochrome_icons">Monokróm ikonok</string>
+    <string name="monochrome_icons_description">Szürkeárnyalatos ikonok használata a kezdőképernyőn Sötét vagy Extrém sötét módban</string>
+    <string name="use_extreme_dark">Extrém sötét használata</string>
+    <string name="use_extreme_dark_description">Tiszta fekete háttér használata sötét módban</string>
     <string name="show_fps_counter">FPS számláló megjelenítése</string>
     <string name="show_fps_counter_description">Valós idejű FPS számláló megjelenítése a bal felső sarokban a kivetítés alatt.</string>
 </resources>

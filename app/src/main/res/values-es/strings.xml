@@ -19,13 +19,25 @@
     <string name="dpi">Densidad de píxeles (DPI)</string>
     <string name="mic_sample_rate">Frecuencia de muestreo del micrófono</string>
     <string name="keymap">Mapa de teclas</string>
-    <string name="night_mode">Modo nocturno</string>
+    <string name="night_mode">Modo oscuro (Android Auto)</string>
     <string name="night_mode_threshold">Umbral del modo noche</string>
     <string name="enter_threshold_value">Ingrese el valor del umbral</string>
     <string name="threshold_lux_desc">Valor de lux (0-10000). Por debajo de esto = Noche.</string>
     <string name="threshold_brightness_desc">Valor de brillo (0-255). Por debajo de esto = Noche.</string>
+    <string name="threshold_light_title">Sensibilidad a la luz</string>
+    <string name="threshold_brightness_title">Nivel de brillo</string>
+    <string name="threshold_light_hint">El modo oscuro se activa cuando la luz ambiental cae por debajo de este nivel</string>
+    <string name="threshold_brightness_hint">El modo oscuro se activa cuando el brillo de la pantalla está por debajo de este valor. Android reporta el brillo como 0–255, pero el rango real puede variar según el dispositivo. Es posible que debas experimentar para encontrar el umbral adecuado para tu dispositivo.</string>
+    <string name="current_light_reading">Luz actual: %d Lux</string>
+    <string name="enable_fine_lux_control">Control fino (0–100 Lux)</string>
     <string name="night_mode_start">Hora de inicio del modo noche</string>
     <string name="night_mode_end">Hora de fin del modo noche</string>
+
+    <string name="app_theme">Modo oscuro (Aplicación)</string>
+    <string name="app_theme_description">Controlar la apariencia visual de la app</string>
+    <string name="change_app_theme">Cambiar tema</string>
+    <string name="category_dark_mode">Modo oscuro</string>
+    <string name="category_navigation">Navegación</string>
 
     <string name="reconnection_required_title">Reconexión necesaria</string>
     <string name="reconnection_required_message">El dispositivo está en estado de espera. Por favor, desconecte y vuelva a conectar el cable USB para reiniciar Android Auto.</string>
@@ -313,6 +325,10 @@
     <string name="nav_action_ferry">Ferry</string>
     <string name="nav_action_ferry_train">Ferry / tren</string>
     <string name="nav_action_destination">Llegada</string>
+    <string name="monochrome_icons">Iconos monocromáticos</string>
+    <string name="monochrome_icons_description">Usar iconos en escala de grises en la pantalla principal en modo Oscuro o Oscuro Extremo</string>
+    <string name="use_extreme_dark">Usar oscuro extremo</string>
+    <string name="use_extreme_dark_description">Usar fondo negro puro cuando el modo oscuro está activo</string>
     <string name="show_fps_counter">Mostrar contador de FPS</string>
     <string name="show_fps_counter_description">Muestra una superposición de FPS en tiempo real en la esquina superior izquierda durante la proyección.</string>
 </resources>

@@ -19,13 +19,25 @@
     <string name="dpi">Pixeldichte (DPI)</string>
     <string name="mic_sample_rate">Mikrofon-Abtastrate</string>
     <string name="keymap">Tastenbelegung</string>
-    <string name="night_mode">Nachtmodus</string>
+    <string name="night_mode">Dunkelmodus (Android Auto)</string>
     <string name="night_mode_threshold">Nachtmodus Schwellenwert</string>
     <string name="enter_threshold_value">Schwellenwert eingeben</string>
     <string name="threshold_lux_desc">Lux Wert (0-10000). Darunter = Nacht.</string>
     <string name="threshold_brightness_desc">Helligkeit (0-255). Darunter = Nacht.</string>
+    <string name="threshold_light_title">Lichtempfindlichkeit</string>
+    <string name="threshold_brightness_title">Helligkeitsstufe</string>
+    <string name="threshold_light_hint">Der Dunkelmodus wird aktiviert, wenn das Umgebungslicht unter diesen Wert fällt</string>
+    <string name="threshold_brightness_hint">Der Dunkelmodus wird aktiviert, wenn die Bildschirmhelligkeit unter diesem Wert liegt. Android meldet die Helligkeit als 0–255, aber der tatsächliche Bereich kann je nach Gerät variieren. Möglicherweise müssen Sie experimentieren, um den richtigen Schwellenwert für Ihr Gerät zu finden.</string>
+    <string name="current_light_reading">Aktuelles Licht: %d Lux</string>
+    <string name="enable_fine_lux_control">Feinsteuerung (0–100 Lux)</string>
     <string name="night_mode_start">Nachtmodus Startzeit</string>
     <string name="night_mode_end">Nachtmodus Endzeit</string>
+
+    <string name="app_theme">Dunkelmodus (Anwendung)</string>
+    <string name="app_theme_description">Aussehen der App steuern</string>
+    <string name="change_app_theme">Design ändern</string>
+    <string name="category_dark_mode">Dunkelmodus</string>
+    <string name="category_navigation">Navigation</string>
 
     <string name="reconnection_required_title">Neuverbindung erforderlich</string>
     <string name="reconnection_required_message">Das Gerät befindet sich in einem Wartezustand. Bitte ziehen Sie das USB-Kabel ab und stecken Sie es wieder ein, um Android Auto neu zu starten.</string>
@@ -313,6 +325,10 @@
     <string name="nav_action_ferry">Fähre</string>
     <string name="nav_action_ferry_train">Fähre / Zug</string>
     <string name="nav_action_destination">Ankunft</string>
+    <string name="monochrome_icons">Einfarbige Symbole</string>
+    <string name="monochrome_icons_description">Graustufen-Symbole auf dem Startbildschirm im Dunkel- oder Extra-Dunkel-Modus verwenden</string>
+    <string name="use_extreme_dark">Extra Dunkel verwenden</string>
+    <string name="use_extreme_dark_description">Rein schwarzen Hintergrund verwenden, wenn der Dunkelmodus aktiv ist</string>
     <string name="show_fps_counter">FPS-Zähler anzeigen</string>
     <string name="show_fps_counter_description">Echtzeit-FPS oben links während der Projektion einblenden.</string>
 </resources>

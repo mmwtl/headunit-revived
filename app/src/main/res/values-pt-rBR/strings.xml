@@ -19,13 +19,25 @@
     <string name="dpi">Densidade de pixels (DPI)</string>
     <string name="mic_sample_rate">Taxa de amostragem do microfone</string>
     <string name="keymap">Mapa de teclas</string>
-    <string name="night_mode">Modo noturno</string>
+    <string name="night_mode">Modo escuro (Android Auto)</string>
     <string name="night_mode_threshold">Limiar do Modo Noturno</string>
     <string name="enter_threshold_value">Inserir valor do limiar</string>
     <string name="threshold_lux_desc">Valor Lux (0-10000). Abaixo disto = Noite.</string>
     <string name="threshold_brightness_desc">Valor de brilho (0-255). Abaixo disto = Noite.</string>
+    <string name="threshold_light_title">Sensibilidade à luz</string>
+    <string name="threshold_brightness_title">Nível de brilho</string>
+    <string name="threshold_light_hint">O modo escuro é ativado quando a luz ambiente cai abaixo deste nível</string>
+    <string name="threshold_brightness_hint">O modo escuro é ativado quando o brilho da tela está abaixo deste valor. O Android reporta o brilho como 0–255, mas o intervalo real pode variar de acordo com o dispositivo. Pode ser necessário experimentar para encontrar o limite adequado para o seu dispositivo.</string>
+    <string name="current_light_reading">Luz atual: %d Lux</string>
+    <string name="enable_fine_lux_control">Controle fino (0–100 Lux)</string>
     <string name="night_mode_start">Hora de início do modo noturno</string>
     <string name="night_mode_end">Hora de término do modo noturno</string>
+
+    <string name="app_theme">Modo escuro (Aplicativo)</string>
+    <string name="app_theme_description">Controlar a aparência visual do app</string>
+    <string name="change_app_theme">Alterar tema</string>
+    <string name="category_dark_mode">Modo escuro</string>
+    <string name="category_navigation">Navegação</string>
 
     <string name="reconnection_required_title">Reconexão necessária</string>
     <string name="reconnection_required_message">O dispositivo está em espera. Desconecte e reconecte o cabo USB para reiniciar o Android Auto.</string>
@@ -313,6 +325,10 @@
     <string name="nav_action_ferry">Balsa</string>
     <string name="nav_action_ferry_train">Balsa / trem</string>
     <string name="nav_action_destination">Chegada</string>
+    <string name="monochrome_icons">Ícones monocromáticos</string>
+    <string name="monochrome_icons_description">Usar ícones em tons de cinza na tela inicial no modo Escuro ou Escuro Extremo</string>
+    <string name="use_extreme_dark">Usar escuro extremo</string>
+    <string name="use_extreme_dark_description">Usar fundo preto puro quando o modo escuro está ativo</string>
     <string name="show_fps_counter">Mostrar contador de FPS</string>
     <string name="show_fps_counter_description">Exibe a contagem de FPS em tempo real no canto superior esquerdo durante a projeção.</string>
 </resources>

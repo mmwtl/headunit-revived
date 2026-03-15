@@ -88,7 +88,7 @@ class Settings(context: Context) {
         }
 
     var nightModeThresholdBrightness: Int
-        get() = prefs.getInt("night-mode-threshold-brightness", 40)
+        get() = prefs.getInt("night-mode-threshold-brightness", 100)
         set(value) {
             prefs.edit().putInt("night-mode-threshold-brightness", value).apply()
         }
@@ -387,6 +387,22 @@ class Settings(context: Context) {
             prefs.edit().putInt("night-mode-manual-end", value).apply()
         }
 
+    // App Theme independent threshold/time settings (separate from Night Mode)
+    var appThemeThresholdLux: Int
+        get() = prefs.getInt("app-theme-threshold-lux", 100)
+        set(value) { prefs.edit().putInt("app-theme-threshold-lux", value).apply() }
+
+    var appThemeThresholdBrightness: Int
+        get() = prefs.getInt("app-theme-threshold-brightness", 100)
+        set(value) { prefs.edit().putInt("app-theme-threshold-brightness", value).apply() }
+
+    var appThemeManualStart: Int
+        get() = prefs.getInt("app-theme-manual-start", 1140)
+        set(value) { prefs.edit().putInt("app-theme-manual-start", value).apply() }
+
+    var appThemeManualEnd: Int
+        get() = prefs.getInt("app-theme-manual-end", 420)
+        set(value) { prefs.edit().putInt("app-theme-manual-end", value).apply() }
     var showFpsCounter: Boolean
         get() = prefs.getBoolean("show-fps-counter", false)
         set(value) {
@@ -456,5 +472,38 @@ class Settings(context: Context) {
             fun fromInt(value: Int) = map[value]
         }
     }
+
+    enum class AppTheme(val value: Int) {
+        AUTOMATIC(0),
+        CLEAR(1),
+        DARK(2),
+        EXTREME_DARK(3),
+        AUTO_SUNRISE(4),
+        MANUAL_TIME(5),
+        LIGHT_SENSOR(6),
+        SCREEN_BRIGHTNESS(7);
+
+        companion object {
+            private val map = values().associateBy(AppTheme::value)
+            fun fromInt(value: Int) = map[value] ?: AUTOMATIC
+        }
+    }
+
+    var monochromeIcons: Boolean
+        get() = prefs.getBoolean("monochrome-icons", false)
+        set(value) { prefs.edit().putBoolean("monochrome-icons", value).apply() }
+
+    var useExtremeDarkMode: Boolean
+        get() = prefs.getBoolean("use-extreme-dark-mode", false)
+        set(value) { prefs.edit().putBoolean("use-extreme-dark-mode", value).apply() }
+
+    var appTheme: AppTheme
+        get() {
+            val value = prefs.getInt("app-theme", 0)
+            return AppTheme.fromInt(value)
+        }
+        set(theme) {
+            prefs.edit().putInt("app-theme", theme.value).apply()
+        }
 
 }

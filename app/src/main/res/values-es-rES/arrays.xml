@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="night_mode">
-        <item>Automático (Amanecer/Atardecer)</item>
+        <item>Auto (Amanecer/Atardecer)</item>
         <item>Claro</item>
         <item>Oscuro</item>
         <item>Hora manual</item>

@@ -19,13 +19,25 @@
     <string name="dpi">Hustota pixelů (DPI)</string>
     <string name="mic_sample_rate">Vzorkovací frekvence mikrofonu</string>
     <string name="keymap">Mapování kláves</string>
-    <string name="night_mode">Noční režim</string>
+    <string name="night_mode">Tmavý režim (Android Auto)</string>
     <string name="night_mode_threshold">Práh nočního režimu</string>
     <string name="enter_threshold_value">Zadejte hodnotu prahu</string>
     <string name="threshold_lux_desc">Hodnota Lux (0-10000). Pod touto hodnotou = Noc.</string>
     <string name="threshold_brightness_desc">Hodnota jasu (0-255). Pod touto hodnotou = Noc.</string>
+    <string name="threshold_light_title">Citlivost na světlo</string>
+    <string name="threshold_brightness_title">Úroveň jasu</string>
+    <string name="threshold_light_hint">Tmavý režim se aktivuje, když okolní světlo klesne pod tuto úroveň</string>
+    <string name="threshold_brightness_hint">Tmavý režim se aktivuje, když je jas obrazovky pod touto hodnotou. Android hlásí jas jako 0–255, ale skutečný rozsah se může lišit podle zařízení. Možná budete muset experimentovat, abyste našli správnou prahovou hodnotu pro vaše zařízení.</string>
+    <string name="current_light_reading">Aktuální světlo: %d Lux</string>
+    <string name="enable_fine_lux_control">Jemné ovládání (0–100 Lux)</string>
     <string name="night_mode_start">Čas zahájení nočního režimu</string>
     <string name="night_mode_end">Čas ukončení nočního režimu</string>
+
+    <string name="app_theme">Tmavý režim (Aplikace)</string>
+    <string name="app_theme_description">Ovládejte vzhled aplikace</string>
+    <string name="change_app_theme">Změnit téma</string>
+    <string name="category_dark_mode">Tmavý režim</string>
+    <string name="category_navigation">Navigace</string>
 
     <string name="reconnection_required_title">Vyžadováno opětovné připojení</string>
     <string name="reconnection_required_message">Zařízení čeká. Odpojte a znovu připojte kabel USB pro restart Android Auto.</string>
@@ -313,6 +325,10 @@
     <string name="nav_action_ferry">Trajekt</string>
     <string name="nav_action_ferry_train">Trajekt / vlak</string>
     <string name="nav_action_destination">Příjezd</string>
+    <string name="monochrome_icons">Monochromatické ikony</string>
+    <string name="monochrome_icons_description">Použít šedé ikony na domovské obrazovce v tmavém nebo extrémně tmavém režimu</string>
+    <string name="use_extreme_dark">Použít extrémně tmavý režim</string>
+    <string name="use_extreme_dark_description">Použít čistě černé pozadí při aktivním tmavém režimu</string>
     <string name="show_fps_counter">Zobrazit počítadlo FPS</string>
     <string name="show_fps_counter_description">Během projekce zobrazí v levém horním rohu aktuální FPS.</string>
 </resources>

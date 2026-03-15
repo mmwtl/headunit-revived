@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.content.res.ColorStateList
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
@@ -21,6 +22,7 @@ import com.andrerinas.headunitrevived.R
 import com.andrerinas.headunitrevived.aap.AapProjectionActivity
 import com.andrerinas.headunitrevived.aap.AapService
 import com.andrerinas.headunitrevived.connection.UsbDeviceCompat
+import android.content.res.Configuration
 import com.andrerinas.headunitrevived.utils.AppLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -179,6 +181,47 @@ class HomeFragment : Fragment() {
             })
     }
 
+    private val originalBackgrounds = mapOf(
+        R.id.self_mode_button to R.drawable.gradient_blue,
+        R.id.usb_button to R.drawable.gradient_orange,
+        R.id.wifi_button to R.drawable.gradient_purple,
+        R.id.settings_button to R.drawable.gradient_darkblue
+    )
+
+    private fun applyMonochromeStyle() {
+        val monochromeBackground = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_monochrome)
+        val grayTint = ColorStateList.valueOf(0xFF808080.toInt())
+        listOf(self_mode_button, usb, wifi, settings).forEach { button ->
+            button.background = monochromeBackground?.constantState?.newDrawable()?.mutate()
+            (button as? com.google.android.material.button.MaterialButton)?.iconTint = grayTint
+        }
+    }
+
+    private fun restoreOriginalStyle() {
+        val whiteTint = ColorStateList.valueOf(0xFFFFFFFF.toInt())
+        val buttons = listOf(self_mode_button, usb, wifi, settings)
+        val ids = listOf(R.id.self_mode_button, R.id.usb_button, R.id.wifi_button, R.id.settings_button)
+        buttons.zip(ids).forEach { (button, id) ->
+            originalBackgrounds[id]?.let { drawableRes ->
+                button.background = ContextCompat.getDrawable(requireContext(), drawableRes)
+            }
+            (button as? com.google.android.material.button.MaterialButton)?.iconTint = whiteTint
+        }
+    }
+
+    private fun updateButtonStyle() {
+        val appSettings = App.provide(requireContext()).settings
+        val isNightActive = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val isDarkTheme = appSettings.appTheme == Settings.AppTheme.DARK ||
+                          appSettings.appTheme == Settings.AppTheme.EXTREME_DARK ||
+                          isNightActive
+        if (isDarkTheme && appSettings.monochromeIcons) {
+            applyMonochromeStyle()
+        } else {
+            restoreOriginalStyle()
+        }
+    }
+
     private fun setupListeners() {
         exitButton.setOnClickListener {
             val stopServiceIntent = Intent(requireContext(), AapService::class.java).apply {
@@ -269,6 +312,7 @@ class HomeFragment : Fragment() {
         super.onResume()
         AppLog.i("HomeFragment: onResume. isConnected=${commManager.isConnected}")
         updateProjectionButtonText()
+        updateButtonStyle()
     }
 
     companion object {

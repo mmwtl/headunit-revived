@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.fragment.NavHostFragment
+import android.content.res.Configuration
 import com.andrerinas.headunitrevived.R
 import com.andrerinas.headunitrevived.app.BaseActivity
 import com.andrerinas.headunitrevived.utils.Settings
@@ -13,20 +14,25 @@ class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
+
         val appSettings = Settings(this)
+        val isNightActive = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        if (appSettings.appTheme == Settings.AppTheme.EXTREME_DARK ||
+            (appSettings.useExtremeDarkMode && isNightActive)) {
+            theme.applyStyle(R.style.ThemeOverlay_ExtremeDark, true)
+        }
         requestedOrientation = appSettings.screenOrientation.androidOrientation
-        
+
         setContentView(R.layout.activity_settings)
-        
+
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.settings_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
-        
+
         // Set the start destination to settingsFragment instead of homeFragment
         val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
         navGraph.startDestination = R.id.settingsFragment
         navController.graph = navGraph
-        
+
         val root = findViewById<View>(R.id.settings_nav_host)
         SystemUI.apply(window, root, appSettings.fullscreenMode)
     }

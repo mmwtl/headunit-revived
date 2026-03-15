@@ -308,11 +308,7 @@ class AapService : Service(), UsbReceiver.Listener {
                     return super.onMediaButtonEvent(mediaButtonEvent)
                 }
             })
-            setPlaybackToRemote(object : VolumeProviderCompat(
-                VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, 100, 50
-            ) {
-                override fun onAdjustVolume(direction: Int) {}
-            })
+            setPlaybackToLocal(android.media.AudioManager.STREAM_MUSIC)
             setMetadata(MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Android Auto")
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Connected")
