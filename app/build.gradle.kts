@@ -34,6 +34,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
     implementation(project(":contract"))
 
+    // FFmpeg for software HEVC decode (optional path when hardware fails)
+    implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.10")
+
     // Multidex
     implementation("androidx.multidex:multidex:2.0.1")
 
@@ -97,7 +100,7 @@ android {
 //        minSdk = 21 // 21 only for google play console. App should work in minSDK 16
         targetSdk = 36
         versionCode = 52
-        versionName = "2.0.2-beta1"
+        versionName = "2.0.2-hevc1"
         setProperty("archivesBaseName", "${applicationId}_${versionName}")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true

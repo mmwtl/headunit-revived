@@ -27,6 +27,7 @@ import com.andrerinas.headunitrevived.utils.AppThemeManager
 import com.andrerinas.headunitrevived.utils.Settings
 import com.andrerinas.headunitrevived.utils.LocaleHelper
 import com.andrerinas.headunitrevived.BuildConfig
+import android.media.MediaCodecList
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -82,6 +83,8 @@ class SettingsFragment : Fragment(), SensorEventListener {
     private var pendingEnableAudioSink: Boolean? = null
     private var pendingUseAacAudio: Boolean? = null
     private var pendingMicInputSource: Int? = null
+    private var pendingHevcDecoderOverride: String? = null
+    private var pendingUseFfmpegForHevc: Boolean? = null
     private var pendingUseNativeSsl: Boolean? = null
     private var pendingAutoStartBtName: String? = null
     private var pendingAutoStartBtMac: String? = null
@@ -155,6 +158,8 @@ class SettingsFragment : Fragment(), SensorEventListener {
         pendingEnableAudioSink = settings.enableAudioSink
         pendingUseAacAudio = settings.useAacAudio
         pendingMicInputSource = settings.micInputSource
+        pendingHevcDecoderOverride = settings.hevcDecoderOverride
+        pendingUseFfmpegForHevc = settings.useFfmpegForHevc
         pendingUseNativeSsl = settings.useNativeSsl
         pendingAutoStartBtName = settings.autoStartBluetoothDeviceName
         pendingAutoStartBtMac = settings.autoStartBluetoothDeviceMac
@@ -300,6 +305,8 @@ class SettingsFragment : Fragment(), SensorEventListener {
         pendingEnableAudioSink?.let { settings.enableAudioSink = it }
         pendingUseAacAudio?.let { settings.useAacAudio = it }
         pendingMicInputSource?.let { settings.micInputSource = it }
+        pendingHevcDecoderOverride?.let { settings.hevcDecoderOverride = it }
+        pendingUseFfmpegForHevc?.let { settings.useFfmpegForHevc = it }
         pendingUseNativeSsl?.let { settings.useNativeSsl = it }
         pendingAutoStartBtName?.let { settings.autoStartBluetoothDeviceName = it }
         pendingAutoStartBtMac?.let { settings.autoStartBluetoothDeviceMac = it }
@@ -420,6 +427,8 @@ class SettingsFragment : Fragment(), SensorEventListener {
                         pendingEnableAudioSink != settings.enableAudioSink ||
                         pendingUseAacAudio != settings.useAacAudio ||
                         pendingMicInputSource != settings.micInputSource ||
+                        pendingHevcDecoderOverride != settings.hevcDecoderOverride ||
+                        pendingUseFfmpegForHevc != settings.useFfmpegForHevc ||
                         pendingUseNativeSsl != settings.useNativeSsl ||
                         pendingAutoStartBtMac != settings.autoStartBluetoothDeviceMac ||
                         pendingAutoStartOnUsb != settings.autoStartOnUsb ||
@@ -453,6 +462,8 @@ class SettingsFragment : Fragment(), SensorEventListener {
                           pendingEnableAudioSink != settings.enableAudioSink ||
                           pendingUseAacAudio != settings.useAacAudio ||
                           pendingUseNativeSsl != settings.useNativeSsl ||
+                          pendingHevcDecoderOverride != settings.hevcDecoderOverride ||
+                          pendingUseFfmpegForHevc != settings.useFfmpegForHevc ||
                           pendingInsetLeft != settings.insetLeft ||
                           pendingInsetTop != settings.insetTop ||
                           pendingInsetRight != settings.insetRight ||
@@ -1032,6 +1043,51 @@ class SettingsFragment : Fragment(), SensorEventListener {
                         updateSettingsList()
                     }
                     .show()
+            }
+        ))
+
+        val hevcCodecs = getHevcDecoderList()
+        if (hevcCodecs.isNotEmpty()) {
+            val hevcDisplay = if (pendingHevcDecoderOverride.isNullOrEmpty()) {
+                getString(R.string.auto)
+            } else {
+                pendingHevcDecoderOverride!!
+            }
+            items.add(SettingItem.SettingEntry(
+                stableId = "hevcDecoder",
+                nameResId = R.string.hevc_decoder,
+                value = hevcDisplay,
+                onClick = {
+                    val options = mutableListOf(getString(R.string.auto))
+                    options.addAll(hevcCodecs)
+                    val currentIndex = if (pendingHevcDecoderOverride.isNullOrEmpty()) {
+                        0
+                    } else {
+                        val idx = hevcCodecs.indexOf(pendingHevcDecoderOverride!!)
+                        if (idx >= 0) idx + 1 else 0
+                    }
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.hevc_decoder)
+                        .setSingleChoiceItems(options.toTypedArray(), currentIndex) { dialog, which ->
+                            pendingHevcDecoderOverride = if (which == 0) "" else hevcCodecs.getOrNull(which - 1) ?: ""
+                            checkChanges()
+                            dialog.dismiss()
+                            updateSettingsList()
+                        }
+                        .show()
+                }
+            ))
+        }
+
+        items.add(SettingItem.ToggleSettingEntry(
+            stableId = "useFfmpegForHevc",
+            nameResId = R.string.use_ffmpeg_for_hevc,
+            descriptionResId = R.string.use_ffmpeg_for_hevc_description,
+            isChecked = pendingUseFfmpegForHevc!!,
+            onCheckedChanged = { isChecked ->
+                pendingUseFfmpegForHevc = isChecked
+                checkChanges()
+                updateSettingsList()
             }
         ))
 
@@ -1784,6 +1840,13 @@ class SettingsFragment : Fragment(), SensorEventListener {
                 dialog.cancel()
             }
             .show()
+    }
+
+    private fun getHevcDecoderList(): List<String> {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return emptyList()
+        return MediaCodecList(MediaCodecList.ALL_CODECS).codecInfos
+            .filter { !it.isEncoder && it.supportedTypes.any { t -> t.equals("video/hevc", true) } }
+            .map { it.name }
     }
 
     companion object {

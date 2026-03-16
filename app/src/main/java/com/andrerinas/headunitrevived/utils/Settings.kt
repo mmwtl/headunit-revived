@@ -270,6 +270,15 @@ class Settings(context: Context) {
         get() = prefs.getInt("mic-input-source", 0) // Default: DEFAULT
         set(value) { prefs.edit().putInt("mic-input-source", value).apply() }
 
+    var hevcDecoderOverride: String
+        get() = prefs.getString("hevc-decoder-override", "")!!
+        set(value) { prefs.edit().putString("hevc-decoder-override", value).apply() }
+
+    /** When true, use FFmpeg software decoder for H.265 instead of MediaCodec. */
+    var useFfmpegForHevc: Boolean
+        get() = prefs.getBoolean("use-ffmpeg-for-hevc", false)
+        set(value) { prefs.edit().putBoolean("use-ffmpeg-for-hevc", value).apply() }
+
     var useAacAudio: Boolean
         get() = prefs.getBoolean("use-aac-audio", false)
         set(value) { prefs.edit().putBoolean("use-aac-audio", value).apply() }

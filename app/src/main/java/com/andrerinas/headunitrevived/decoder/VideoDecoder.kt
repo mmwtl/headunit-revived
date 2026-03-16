@@ -41,6 +41,8 @@ class VideoDecoder(private val settings: Settings) {
     private var pps: ByteArray? = null
     private var codecConfigured = false
     private var currentCodecType = CodecType.H264
+    private var useFfmpegPath = false
+    private var ffmpegDecoder: FfmpegHevcDecoder? = null
 
     // Buffers cache for API < 21
     private var inputBuffers: Array<ByteBuffer>? = null
@@ -54,10 +56,13 @@ class VideoDecoder(private val settings: Settings) {
     // thread). Fired on the first releaseOutputBuffer — i.e. when the frame is actually rendered.
     @Volatile var onFirstFrameListener: (() -> Unit)? = null
     // Timestamp of the last rendered frame (elapsedRealtime). 0 means no frame has been rendered yet.
-    @Volatile var lastFrameRenderedMs: Long = 0L
+    @Volatile private var lastFrameRenderedMsInternal: Long = 0L
+    var lastFrameRenderedMs: Long
+        get() = if (useFfmpegPath && ffmpegDecoder != null) ffmpegDecoder!!.lastFrameRenderedMs else lastFrameRenderedMsInternal
+        set(value) { lastFrameRenderedMsInternal = value }
 
-    val videoWidth: Int get() = mWidth
-    val videoHeight: Int get() = mHeight
+    val videoWidth: Int get() = if (useFfmpegPath && ffmpegDecoder != null) ffmpegDecoder!!.videoWidth else mWidth
+    val videoHeight: Int get() = if (useFfmpegPath && ffmpegDecoder != null) ffmpegDecoder!!.videoHeight else mHeight
 
     enum class CodecType(val mimeType: String, val displayName: String) {
         H264("video/avc", "H.264/AVC"),
@@ -88,6 +93,7 @@ class VideoDecoder(private val settings: Settings) {
                 stop("New surface")
             }
             mSurface = surface
+            ffmpegDecoder?.setSurface(surface)
         }
     }
 
@@ -112,7 +118,9 @@ class VideoDecoder(private val settings: Settings) {
             codecBufferInfo = null
             codecConfigured = false
             onFirstFrameListener = null
-            lastFrameRenderedMs = 0L
+            lastFrameRenderedMsInternal = 0L
+            ffmpegDecoder?.stop(reason)
+            useFfmpegPath = false
             AppLog.i("Decoder stopped: $reason")
         }
     }
@@ -135,6 +143,24 @@ class VideoDecoder(private val settings: Settings) {
             val detectedType = detectCodecType(frameData, 0, size)
             val typeToUse = detectedType ?: if (codecName.contains("265")) CodecType.H265 else CodecType.H264
             currentCodecType = typeToUse
+
+            if (typeToUse == CodecType.H265 && settings.useFfmpegForHevc) {
+                useFfmpegPath = true
+                if (ffmpegDecoder == null) {
+                    ffmpegDecoder = FfmpegHevcDecoder(settings).apply {
+                        dimensionsListener = this@VideoDecoder.dimensionsListener
+                        onFpsChanged = this@VideoDecoder.onFpsChanged
+                        onFirstFrameListener = this@VideoDecoder.onFirstFrameListener
+                        setSurface(mSurface)
+                    }
+                }
+                ffmpegDecoder?.dimensionsListener = dimensionsListener
+                ffmpegDecoder?.onFpsChanged = onFpsChanged
+                ffmpegDecoder?.onFirstFrameListener = onFirstFrameListener
+                ffmpegDecoder?.decode(frameData, 0, size)
+                return
+            }
+            useFfmpegPath = false
 
             if (!codecConfigured) {
                 if (containsCodecConfig(frameData, 0, size, typeToUse)) {
@@ -417,7 +443,7 @@ class VideoDecoder(private val settings: Settings) {
                 val outputIndex = currentCodec.dequeueOutputBuffer(bufferInfo, 10000L)
                 if (outputIndex >= 0) {
                     currentCodec.releaseOutputBuffer(outputIndex, true)
-                    lastFrameRenderedMs = SystemClock.elapsedRealtime()
+                    lastFrameRenderedMsInternal = SystemClock.elapsedRealtime()
                     onFirstFrameListener?.let { it(); onFirstFrameListener = null }
 
                     // Track FPS
@@ -454,6 +480,14 @@ class VideoDecoder(private val settings: Settings) {
         }
 
         val infos = codecInfos.filter { !it.isEncoder && it.supportedTypes.any { t -> t.equals(mimeType, true) } }
+
+        if (mimeType.equals(CodecType.H265.mimeType, ignoreCase = true)) {
+            val override = settings.hevcDecoderOverride
+            if (override.isNotEmpty()) {
+                val match = infos.find { it.name == override }
+                if (match != null) return match.name
+            }
+        }
         
         val hw = infos.find { isHardwareAccelerated(it.name) }
         val sw = infos.find { !isHardwareAccelerated(it.name) }
