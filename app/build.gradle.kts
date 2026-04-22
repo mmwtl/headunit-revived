@@ -13,6 +13,9 @@ dependencies {
     // Conscrypt
     implementation("org.conscrypt:conscrypt-android:2.5.3")
 
+    // FFmpeg Kit for full codec support (H.264, H.265, VP8, VP9, etc.)
+    implementation("com.arthenica:ffmpeg-kit-full:6.0-2")
+
     implementation("com.google.protobuf:protobuf-java:3.25.1")
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
