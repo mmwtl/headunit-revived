@@ -195,6 +195,10 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("force-software-decoding", false)
         set(value) { prefs.edit().putBoolean("force-software-decoding", value).apply() }
 
+    var forceSoftwareEncoding: Boolean
+        get() = prefs.getBoolean("force-software-encoding", false)
+        set(value) { prefs.edit().putBoolean("force-software-encoding", value).apply() }
+
     var rightHandDrive: Boolean
         get() = prefs.getBoolean("right-hand-drive", false)
         set(value) { prefs.edit().putBoolean("right-hand-drive", value).apply() }

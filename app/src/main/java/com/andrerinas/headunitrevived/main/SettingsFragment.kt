@@ -74,6 +74,7 @@ class SettingsFragment : Fragment(), SensorEventListener {
     private var pendingFullscreenMode: Settings.FullscreenMode? = null
     private var pendingViewMode: Settings.ViewMode? = null
     private var pendingForceSoftware: Boolean? = null
+    private var pendingForceSoftwareEncoding: Boolean? = null
     private var pendingRightHandDrive: Boolean? = null
     private var pendingWifiConnectionMode: Int? = null
     private var pendingVideoCodec: String? = null
