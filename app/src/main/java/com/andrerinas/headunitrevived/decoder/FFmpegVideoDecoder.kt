@@ -184,7 +184,7 @@ class FFmpegVideoDecoder(private val settings: Settings) {
     fun executeCommand(command: String, onComplete: (Boolean) -> Unit) {
         val args = command.split(" ")
         
-        currentSession = FFmpegKit.executeAsync(args.toTypedArray(), { session ->
+        currentSession = FFmpegKit.executeAsync(*args.toTypedArray(), { session ->
             if (ReturnCode.isSuccess(session.returnCode)) {
                 AppLog.i("FFmpeg command completed successfully")
                 onComplete(true)
