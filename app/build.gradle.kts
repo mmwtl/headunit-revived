@@ -14,7 +14,7 @@ dependencies {
     implementation("org.conscrypt:conscrypt-android:2.5.3")
 
     // FFmpeg Kit для поддержки кодеков (облегченная версия: H264, HEVC, AAC - ~15 МБ)
-    implementation("com.arthenica:ffmpeg-kit-min-gpl:5.1")
+    implementation("io.github.trongnhan136:ffmpeg-kit-min-gpl:7.1.5")
 
     implementation("com.google.protobuf:protobuf-java:3.25.1")
     implementation("androidx.activity:activity-ktx:1.8.2")
