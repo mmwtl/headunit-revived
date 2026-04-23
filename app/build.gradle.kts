@@ -100,7 +100,7 @@ android {
 
     defaultConfig {
         applicationId = "com.andrerinas.headunitrevived"
-        minSdk = 16
+        minSdk = 24
         targetSdk = 36
         versionCode = 60
         versionName = "2.2.1"
@@ -123,11 +123,11 @@ android {
     productFlavors {
         create("playstore") {
             dimension = "distribution"
-            minSdk = 21
+            minSdk = 24
         }
         create("github") {
             dimension = "distribution"
-            // Default minSdk 16 from defaultConfig is used
+            // Default minSdk 24 from defaultConfig is used
         }
     }
 
