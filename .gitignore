@@ -1,30 +1,55 @@
 ```
-# Build artifacts
-build/
-*.jar
-*.war
+# Compiled/Binary files
 *.class
-*.aar
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.exe
+*.out
 
 # Dependencies
-.gradle/
 node_modules/
 venv/
 .venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
 
-# IDE
-.idea/
+# Build artifacts
+build/
+dist/
+*.jar
+*.war
+*.apk
+*.aab
+
+# IDE files
 .vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
-# Logs
-*.log
-
-# Environment
+# System files
+.DS_Store
+Thumbs.db
 .env
 .env.local
 *.env.*
 
-# OS
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Gradle
+.gradle/
+!gradle/
 ```

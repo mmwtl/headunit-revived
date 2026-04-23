@@ -127,7 +127,7 @@ android {
         }
         create("github") {
             dimension = "distribution"
-            // Default minSdk 24 from defaultConfig is used
+            minSdk = 24
         }
     }
 

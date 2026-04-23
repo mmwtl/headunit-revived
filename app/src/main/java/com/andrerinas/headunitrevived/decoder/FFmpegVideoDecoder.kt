@@ -16,6 +16,7 @@ import com.arthenica.ffmpegkit.FFmpegSession
 import com.arthenica.ffmpegkit.ReturnCode
 import com.arthenica.ffmpegkit.MediaInformationSession
 import com.arthenica.ffmpegkit.FFprobeKit
+import com.arthenica.ffmpegkit.FFmpegKitConfig
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -32,7 +33,8 @@ class FFmpegVideoDecoder(private val settings: Settings) {
         fun isFFmpegAvailable(): Boolean {
             return try {
                 // Try to get FFmpeg version to verify it's loaded
-                FFmpegKit.getVersion().isNotEmpty()
+                val version = FFmpegKitConfig.getFFmpegVersion()
+                version.isNotEmpty()
             } catch (e: Exception) {
                 AppLog.e("FFmpeg not available", e)
                 false
@@ -44,7 +46,7 @@ class FFmpegVideoDecoder(private val settings: Settings) {
          */
         fun getFFmpegVersion(): String {
             return try {
-                FFmpegKit.getVersion()
+                FFmpegKitConfig.getFFmpegVersion()
             } catch (e: Exception) {
                 "Unknown"
             }
@@ -180,13 +182,13 @@ class FFmpegVideoDecoder(private val settings: Settings) {
      * Executes an FFmpeg command asynchronously.
      */
     fun executeCommand(command: String, onComplete: (Boolean) -> Unit) {
-        val args = command.split(" ").toTypedArray()
+        val args = command.split(" ")
         
-        currentSession = FFmpegKit.executeAsync(*args, { session ->
-            ReturnCode.isSuccess(session.returnCode)?.let {
+        currentSession = FFmpegKit.executeAsync(args.toTypedArray(), { session ->
+            if (ReturnCode.isSuccess(session.returnCode)) {
                 AppLog.i("FFmpeg command completed successfully")
                 onComplete(true)
-            } ?: run {
+            } else {
                 AppLog.e("FFmpeg command failed: ${session.failStackTrace}")
                 onComplete(false)
             }
